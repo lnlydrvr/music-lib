@@ -1,0 +1,7 @@
+/* Каркас React: styles.css ждёт flex-колонку на body, содержимое живёт в #root. */
+#root {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 100dvh;
+}

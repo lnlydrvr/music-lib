@@ -1,0 +1,390 @@
+{
+  "common": {
+    "loading": "Loading…",
+    "progress_aria": "Operation progress",
+    "cover_alt": "Cover: {title}",
+    "empty_value": "—",
+    "errors": {
+      "unavailable": "Something went wrong"
+    }
+  },
+  "pipeline": { "aria": "Operation stages", "stage_aria": "{label}: {state}", "expected": "expected", "running": "running", "done": "done", "error": "error", "skipped": "skipped" },
+  "queue": { "done": "Done", "error": "Error", "dismissed": "Removed from queue", "undo": "Undo" },
+  "nav": {
+    "home": "Home",
+    "library": "Library",
+    "search": "Search",
+    "recommendations": "Recommendations",
+    "issues": "Issues",
+    "settings": "Settings"
+  },
+  "dialogs": {
+    "confirm": { "title": "Confirmation" },
+    "prompt": { "title": "Input" },
+    "cancel": "Cancel",
+    "ok": "OK",
+    "close": "Close",
+    "close_aria": "Close dialog",
+    "keymap": {
+      "title": "Keyboard shortcuts", "command": "Command palette", "navigation": "Home / Library / Search / Recommendations / Issues / Settings", "theme": "Dark / light theme", "this_list": "This list", "dismiss": "Close dialog / list", "enter": "Search / select", "next_track": "Next / previous track"
+    },
+    "yes": "Yes"
+  },
+  "shell": {
+    "more": "More",
+    "skip_to_content": "Skip to content",
+    "nav": { "main_aria": "Main navigation", "mobile_aria": "Mobile navigation", "more_aria": "Additional navigation" },
+    "stats": { "health_title": "Library health (tracks without issues)", "tracks": "{count, plural, one {# track} other {# tracks}} · {size}" },
+    "theme": { "switch": "Switch theme", "light": "light", "dark": "dark" },
+    "command": { "label": "Command palette", "search": "Find command…", "empty": "Nothing found", "navigate": "Navigate", "actions": "Actions" }
+  },
+  "player": { "preview": "Preview", "close": "Close player", "play": "Play", "pause": "Pause", "position": "Playback position", "listen": "Listen", "listen_track": "Listen: {title}" },
+  "jobs": {
+    "common": { "done": "Done", "failed": "Error" },
+    "dock": { "launching": "Starting...", "empty": "No active tasks", "active": "Downloads · {count} · {percent}%", "failed": "Downloads · error ({count})", "ready": "Downloads · ready", "title": "Downloads", "clear": "Clear", "clear_title": "Remove completed", "clear_aria": "Remove completed tasks", "expand": "Downloads: expand", "collapse": "Downloads: collapse", "background_aria": "Background tasks", "dismiss": "Dismiss", "dismiss_item": "Dismiss: {title}", "fallback_name": "Background task" },
+    "auth": { "extract_name": "Extract browser cookies", "accounts_name": "Find browser accounts", "oauth_name": "YouTube Music OAuth", "read_cookies": "Reading browser cookies…", "saved_checking": "Authorization saved. Checking account…", "confirmation_link": "Confirmation link received", "creating_session": "Creating OAuth session…" },
+    "ytm": { "name": "YouTube Music — download", "item": "[{index}/{total}] {label}", "clip_missing": "[{index}/{total}] {label} (video clip — audio version not found)", "bytes": "{label} — {sizeMb} MB", "item_failed": "[{index}/{total}] error: {label}", "item_downloaded": "[{index}/{total}] downloaded: {label}" },
+    "download": { "name": "Download", "batch_name": "Batch download", "fetching_info": "Fetching video information…", "bytes": "Downloading… {sizeMb} MB", "tagging": "Downloaded; processing tags…", "batch_progress": "[{index}/{total}] {name} — {sizeMb} MB", "batch_finished": "[{index}/{total}] {name} — finished", "batch_item": "[{index}/{total}] {url}…", "unknown_error": "Unknown error", "failed": "Download error", "batch_complete": "[{index}/{total}] {label}" },
+    "shazam": { "scan_name": "Shazam — search", "download_name": "Shazam — download", "scanning": "Searching for {count, plural, one {# track} other {# tracks}} in YouTube Music…", "processed": "Processed {index}/{total}", "file_missing": "Shazam file is not set or found — specify its path in Settings", "empty_file": "File is empty or contains no recognized tracks", "file_unset": "Shazam file is not set" },
+    "recommend": { "name": "Recommendations", "scanning": "Scanning library…", "radio": "YouTube Music radio…", "seed": "Processed seed {index} of {total}" },
+    "library": { "sort_name": "Sort library" }, "lyrics": { "name": "Update lyrics", "item": "[{index}/{total}] {filename}" }, "compress": { "name": "Compression", "item": "[{index}/{total}]", "audio_result": "Audio compressed", "cover_result": "Covers recompressed" }, "primuse": { "backfill_name": "Primuse — sidecars", "cleanup_name": "Primuse — cleanup", "scanning": "Scanning sidecar files…", "backfill_item": "[{index}/{total}] {filename}" }
+  },
+  "home": {
+    "find_music": "Find music",
+    "subtitle": "Music library, tags, lyrics and reports", "tidy": "Tidy up",
+    "recent": { "title": "Recently added", "empty": "Nothing here yet", "empty_hint": "Find music on the Search tab" },
+    "stats": { "duration": "Duration", "size": "Size", "title": "Statistics", "genres": "Genres" },
+    "health": { "title": "Health", "ok": "All good" }, "shazam": { "queued": "Queued: {count}", "file_unconfigured": "File not configured" }
+  },
+  "discover": { "tabs_aria": "Downloads: sections", "search": "Search", "shazam": "Shazam" },
+  "search": {
+    "title": "Search & download", "subtitle": "Find music on YouTube or YouTube Music and download it in the chosen format", "source": "Search source", "query": "YouTube query or URL", "placeholder": "YouTube query or URL (video / playlist / audio)", "action": "Search", "searching": "Searching…", "processing": "Processing…", "results_ytm": "Results (YouTube Music): {query}", "results_yt": "Results: {query}", "download": "Download", "download_aria": "Download: {title}", "in_library": "in library", "failed": "Search failed: {message}", "retry": "Try again", "playlist": "Playlist ({count, plural, one {# track} other {# tracks}})", "select": "Select: {title}", "channel": "Channel", "duration": "Duration", "all": "All", "none": "None", "download_selected": "Download selected ({count})", "more": "Show 10 more ({count} shown)", "empty": "Nothing found", "empty_hint": "Try another query or paste a direct link", "yt_note": "Downloads use the format from Settings; metadata from iTunes/Deezer can be offered afterwards.", "ytm_note": "Tags come from YouTube Music (album and cover); downloads use the format from Settings; metadata from iTunes/Deezer can be offered afterwards.", "metaflow": { "metadata_searching": "Finding metadata from sources…", "confirm": "Load metadata from sources?", "skip": "Skip", "lyrics_updating": "Updating lyrics (LRCLIB)…", "moving": "Moving to library…", "moved": "Done: {path}", "added_to_library": "Track added to library", "downloaded_processing": "Downloaded; post-processing…" }, "batch": { "title": "Batch: {count, plural, one {# track} other {# tracks}}", "completed": "Downloaded: {downloaded}, errors: {failed}" } },
+  "quality": {
+    "selection": {
+      "required": "Select tracks using the checkboxes on the cards",
+      "toolbar": "Selected track actions",
+      "track_aria": "Select: {name}",
+      "select_all": "Select all ({count})"
+    },
+    "refreshing": "Refreshing list…",
+    "refresh": "Refresh",
+    "lyrics_item_progress": "[{completed}/{total}] {path}",
+    "lyrics": {
+      "update_action": "Update", "action": "Lyrics",
+      "singular": "Lyrics"
+    },
+    "category": {
+      "unreadable": "Unreadable files", "missing": "Missing tags", "duplicates": "Duplicates", "mismatch": "Filename mismatch", "loose": "Files outside folders", "whitespace": "Extra spaces", "case": "Capitalization", "feat": "Featured artists", "tracknum": "Track numbers", "album_artist": "Album artist", "genre": "Genre", "year": "Year", "track_number": "Track numbers", "disc_number": "Disc numbers", "global_genre": "Global genres"
+    },
+    "cause": {
+      "track_number": "Track numbers", "disc_number": "Disc numbers", "album_artist": "Album artist", "global_genre": "Global genres"
+    },
+    "screen": {
+      "title": "Library issues", "subtitle": "one report: files, tags, and suggested fixes", "include_inbox": "Include Inbox", "normalize": "Normalize", "reset": "Reset", "field": "Field", "file": "File", "old": "Old", "new": "New", "checked": "Checked tracks: {count}", "problems": "Problems: {count}", "auto_fixes": "Auto-fixes: {count}", "none": "No issues found", "show_all": "Show all", "empty_filter": "No tracks with selected categories", "fix": "Fix", "editor": "Editor", "auto_fixes_title": "This is how many changes auto-fix will suggest", "auto_fixes_badge": "auto-fixes: {count}", "normalization_plan": "Normalization plan — {count}", "apply_title": "Apply changes?", "tag_changes": "Tag changes — {count}", "files": "Files — {count}", "conflicts": "Conflicts — {count}", "conflicts_hint": "these items will be skipped; the rest will be applied", "action": "Action", "destination": "Destination", "move": "Move", "rename": "Rename", "obstacle": "Obstacle", "apply": "Apply ({count})", "cancel": "Cancel", "selected": "Selected: {count}", "deselect_all": "Deselect all ({count})", "show_category": "Show category: {label}", "hide_category": "Hide category: {label}", "lyrics_updated": "Lyrics updated", "lyrics_missing": "Lyrics not found", "no_auto_changes": "No automatic changes for selected tracks", "apply_summary": "Applied: {applied}, skipped: {skipped}{notes}", "conflict_note": "conflicts: {count}", "error_note": "errors: {count}", "select_tracks": "Select tracks using the checkboxes on the cards", "saved": "Saved: {count} tracks", "update_lyrics": "Update lyrics for {count} tracks?", "updating": "Updating", "lyrics_progress": "Updated: {updated}, not found: {missed}{errors}", "refreshing": "Refreshing list…", "category_count": "{label} ({count})", "track_changes": "Select: {name}" 
+    }
+  },
+  "recommend": {
+    "title": "Library recommendations", "subtitle": "Recommendations based on your library. Likes, dislikes, and saves are sent to YouTube Music", "info": "Library: {library} tracks · recommendations: {total}", "counter": "{current} of {total}", "refresh": "Refresh recommendations", "open_settings": "Open settings", "similar": "similar to: {seed}", "hint": "{dislike} · {apply} · buttons below", "dislike": "Dislike", "dislike_overlay": "DISLIKE", "dislike_done": "Dislike sent — the radio will take it into account", "dislike_swipe": "◀ swipe — dislike", "dislike_key": "← dislike", "skip": "Skip", "disconnected": "YouTube Music is not connected", "seeds": { "collecting": "Collecting seeds…" }, "streaming": { "title": "Processing the next seeds", "hint": "cards will appear as they are processed" }, "empty": { "title": "No more recommendations", "hint": "YouTube Music radio will update later" },
+    "apply": { "library": "To library", "library_overlay": "TO LIBRARY", "library_done": "Saved to the YouTube Music library", "library_hint": "swipe ▶ — to library", "library_hint_key": "→ to library", "like": "Like", "like_overlay": "LIKE", "like_done": "Like sent to YouTube Music", "like_hint": "swipe ▶ — like", "like_hint_key": "→ like" }
+  },
+  "shazam": { "subtitle": "Find music from a “Title — Artist” list. Matches are searched on YouTube Music, then YouTube if needed.", "search": "Find matches", "searching": "Searching for matches…", "unconfigured": "Shazam file is not configured", "unconfigured_hint": "Set the path to the “Title — Artist” list file in Settings", "open_settings": "Open settings", "file": "File: {path}", "duration": "Duration", "download_hint": "Downloads use the format from Settings. You can then load metadata from iTunes/Deezer, lyrics, and move the track to the library. The track line is removed from the file after download.", "match": "{duration} · match {score}%", "no_matches": "No matches found on YouTube Music", "stage": { "metadata": "Metadata", "lyrics": "Lyrics", "library": "To library" }, "remove": { "title": "Remove track line from file", "aria": "Remove line: {entry}", "action": "Remove line", "confirm": "Remove the track line from the file?", "done": "Lines removed: {count}" } },
+  "editor": {
+    "saved": "Tags saved", "load_error": "Error", "loading": "Loading...", "cover": "Cover", "current_cover": "Current cover", "current_cover_alt": "Current track cover", "source_cover": "Source cover", "source_cover_alt": "Selected source cover", "apply_cover": "Apply cover", "cover_not_found": "Cover not found", "source": "Source", "restore_title": "Restore the original value from the file", "restore_aria": "Restore the original value of {field}", "searching_sources": "Searching sources...", "sources_not_found": "No sources found", "album_tags": "Album tags", "album_tags_with_album": "Album tags: {album}", "source_record": "Source record", "select_source": "Select source: {source}", "searching_in": "Searching {source}…",
+    "groups": { "Основное": "Main", "Релиз": "Release", "Прочее": "Other" },
+    "dialog": { "title": "Editor: {title}", "untitled": "track", "save": "Save", "cancel": "Cancel" },
+    "batch": { "title": "Batch metadata editing", "done": "Done", "saved": "{count, plural, one {Tags saved} other {Saved tracks: #}}", "select_source_first": "Select a source for the current track first", "applying": "Applying {index}/{total}…", "applied": "Applied: {applied}{failed, select, 0 {} other {, errors: {failed}}}", "tracks": "Tracks ({count})", "apply_source_title": "Apply the source selected for the current track to all tracks", "apply_source_aria": "Apply the selected source to all tracks", "apply_all": "Apply to all tracks", "list_aria": "Tracks to edit", "unsaved_aria": "{title} (has unsaved changes)" },
+    "sources_unavailable": "Sources are unavailable", "sources_unavailable_reason": "Sources are unavailable: {reason}",
+    "fields": {
+      "title": "Title",
+      "artist": "Artist",
+      "album": "Album",
+      "album_artist": "Album artist",
+      "year": "Year",
+      "genre": "Genre",
+      "isrc": "ISRC",
+      "composer": "Composer",
+      "publisher": "Publisher / Label",
+      "comment": "Comment",
+      "track_number": "Track number",
+      "disc_number": "Disc number",
+      "cover": "Cover"
+    }
+  },
+  "ytm": {
+    "empty": "Nothing found",
+    "tracks": {
+      "count": "{count, plural, one {# track} other {# tracks}}"
+    },
+    "cover_alt": "Cover: {title}",
+    "radio": {
+      "title": "Similar (radio)",
+      "track_aria": "Similar: {title}",
+      "button": "Radio"
+    },
+    "download": {
+      "title": "Download",
+      "track_aria": "Download: {title}",
+      "archive": "Archive: {name}",
+      "completed": "Downloaded: {count}", "album_name": "Album: {title}", "artist_name": "Artist: {title}", "youtube_name": "YouTube: {title}", "playlist_name": "Playlist: {title}", "radio_name": "Radio: {title}",
+      "all_missing": "Download missing ({count})",
+      "popular": "Download popular ({count})",
+      "already_in_library": "Everything is already in the library"
+    },
+    "artist": {
+      "local_count": "{count} in library"
+    },
+    "back": "← Back", "loading_album": "Loading album…", "loading_artist": "Loading artist…", "loading_playlist": "Loading playlist…", "album": "Album", "artist_label": "Artist", "albums": "Albums", "popular": "Popular songs", "top_tracks": "Top tracks", "finding_popular": "Finding popular tracks…", "not_found": "Nothing found", "playlist": "Playlist", "similar": "Similar:", "similar_empty": "No similar tracks found", "close_aria": "Close", "track_number": "Track number", "source": "Source", "in_library": "In library", "clip": "clip", "clip_title": "This is a video clip, not an audio version", "track_in_library": "Track is already in the local library", "album_in_library": "Album is in the local library", "album_partial": "Album is partially saved — some tracks are on YouTube Music", "album_missing": "Not in the local library", "no_tracks": "empty", "album_none": "none", "short_tracks": "{count} tracks", "subscribers": "{value} subscribers", "album_aria": "Album: {title}{artist}", "album_cover": "Album cover: {title}", "artist_aria": "Artist: {name}", "artist_photo": "Photo: {name}", "files_in_library": "Files in the local library", "subscribed": "subscribed", "subscription": "YouTube Music subscription"
+  },
+  "library": {
+    "subtitle": "All files, tags, covers and lyrics",
+    "tabs": {
+      "albums": "Albums",
+      "tracks": "Tracks",
+      "artists": "Artists",
+      "playlists": "Playlists"
+    },
+    "views_aria": "Library views",
+    "density": {
+      "grid": "Grid",
+      "compact": "Compact",
+      "list": "List",
+      "aria": "Grid density"
+    },
+    "more_actions": "More actions",
+    "refresh_aria": "Refresh library",
+    "albums": {
+      "shown": "Showing {shown} of {total} albums",
+      "count": "{count, plural, one {# album} other {# albums}}"
+    },
+    "artists": {
+      "count": "{count, plural, one {# artist} other {# artists}}"
+    },
+    "tracks": {
+      "shown": "Showing {shown} of {total}"
+    },
+    "playlists": {
+      "count": "{count, plural, one {# playlist} other {# playlists}}",
+      "disconnected": "YouTube Music is not connected: connect it in Settings",
+      "none": "No saved playlists"
+    },
+    "cloud": {
+      "more": " · {count} more on YouTube Music",
+      "only": "{count} on YouTube Music"
+    },
+    "empty": "Library is empty",
+    "empty_hint": "Find and download music; files will appear here",
+    "detail": {
+      "heading": "Information",
+      "choose_track": "Select a track"
+    },
+    "filters": {
+      "no_results": "Nothing matches the filters",
+      "search_placeholder": "Find…",
+      "search_aria": "Search by title, artist or album",
+      "clear_search": "Clear search",
+      "label": "Filter:",
+      "all_artists": "All artists",
+      "artist_aria": "Filter by artist",
+      "all_albums": "All albums",
+      "album_aria": "Filter by album",
+      "all_genres": "All genres",
+      "genre_aria": "Filter by genre",
+      "missing_lyrics": "no lyrics",
+      "needs_compression": "needs compression",
+      "reset": "Reset"
+    },
+    "compress": {
+      "needed": "Needed ({before} → {after})",
+      "ok": "OK",
+      "needed_short": "compress",
+      "confirm": "Compress {count, plural, one {# track} other {# tracks}} to the quality set in Settings?",
+      "action": "Compress",
+      "selected_action": "Compress selected"
+    },
+    "ytm": {
+      "liked_title": "Liked on YouTube Music"
+    },
+    "card": {
+      "open_track_aria": "Open details: {name}",
+      "format_title": "Format",
+      "bitrate_title": "Bitrate",
+      "ytm_aria": "YouTube Music: {name}",
+      "clip_title": "Video clip on YouTube Music",
+      "open_album_artist_aria": "Open album: {title} — {artist} ({have} of {total} tracks)",
+      "open_album_aria": "Open album: {title} ({have} of {total} tracks)",
+      "album_cover_alt": "Album cover: {name}",
+      "artist_aria": "Artist: {name} ({count} tracks)"
+    },
+    "artist": {
+      "files": "{count, plural, one {# file} other {# files}}"
+    },
+    "selection": {
+      "tags": "Tags",
+      "saved": "Saved: {count, plural, one {# track} other {# tracks}}",
+      "tags_action": "Tags for selected tracks",
+      "badge": "selected {count}",
+      "count": "Selected {count}",
+      "deselect_all": "Deselect all"
+    },
+    "track": {
+      "meta_action": "Metadata",
+      "compression_label": "Compression",
+      "edit_tags": "Edit tags",
+      "delete_action": "Delete track"
+    },
+    "lyrics": {
+      "confirm_all": "Update synchronized lyrics? Tracks that already have synchronized lyrics will be skipped.",
+      "preparing": "Preparing the lyrics list…",
+      "summary": "Updated: {updated}, skipped: {skipped}, errors: {errors}",
+      "update_title": "Update lyrics",
+      "update_aria": "Update song lyrics"
+    },
+    "sort": {
+      "already_sorted": "Everything is already sorted into folders",
+      "title": "Sort into folders",
+      "move_count": "Files to move: {count}",
+      "move_count_truncated": "Files to move: {count} (first {shown} shown)",
+      "explanation": "Move into Artist/Album folders according to tags; empty folders will be removed",
+      "action": "Sort",
+      "summary": "Moved: {moved}, folders removed: {removed}",
+      "control_title": "Sort",
+      "control_aria": "Sort tracks",
+      "by_title": "By title",
+      "by_artist": "By artist",
+      "by_size": "By size",
+      "folders_aria": "Sort into Artist/Album folders"
+    },
+    "dedup": {
+      "mode": "Deduplication mode",
+      "exact": "Exact (MD5)",
+      "semantic": "Semantic (title + artist)",
+      "find": "Find",
+      "none": "No duplicates found",
+      "instructions": "Groups found: {count}. Select the files to delete.",
+      "group": "Group:",
+      "best": "best",
+      "delete_selected": "Delete selected",
+      "deleted": "Deleted: {count}",
+      "find_action": "Find duplicates"
+    },
+    "merge": {
+      "none": "No albums with multiple tracks found",
+      "title": "Merge albums",
+      "instructions": "Albums found: {count}. Select the albums to merge.",
+      "mixed": "different artists",
+      "album_meta": "{count, plural, one {# track} other {# tracks}} · {artists}",
+      "selected": "Merge selected",
+      "album_artist_prompt": "Album artist for albums with different artists",
+      "merged": "Merged: {count}"
+    },
+    "inbox": {
+      "moved_to": "Moved to: {path}",
+      "move_confirm": "Move {count, plural, one {# file} other {# files}} from Inbox into Artist/Album folders using tags?",
+      "move_action": "Move",
+      "item_progress": "{index}/{total}: {title}",
+      "move_summary": "Moved: {count}",
+      "move_summary_errors": "Moved: {count}, errors: {failed}",
+      "delete_all_title": "Delete everything from Inbox",
+      "delete_confirm": "Permanently delete {count, plural, one {# file} other {# files}}?",
+      "delete_warning": "Files will be erased from disk and cannot be restored",
+      "delete_all": "Delete all",
+      "delete_item_progress": "{index}/{total}",
+      "delete_summary": "Deleted: {count}",
+      "delete_summary_errors": "Deleted: {count}, errors: {failed}",
+      "move_all_aria": "Move all Inbox files to the library ({count})",
+      "move_all": "Move all ({count})",
+      "delete_all_aria": "Delete all Inbox files ({count})",
+      "heading": "Inbox — files outside folders ({count})"
+    },
+    "album_detail": {
+      "region": "Album",
+      "back": "← Back",
+      "cover_alt": "Album cover: {title}",
+      "fill_tags_title": "Fill tags for the whole album from one source",
+      "fill_tags": "Choose album tags",
+      "common_tags_title": "Set shared tags (artist, album, year, and more) for every track",
+      "common_tags": "Common album tags",
+      "cover_title": "Choose cover art from sources for every track in the album",
+      "cover": "Album cover",
+      "genres": "Genres",
+      "missing": "Missing from local library ({count})",
+      "download_all_title": "Download all missing tracks",
+      "download_all": "Download all ({count})",
+      "download_name": "Album: {title}",
+      "tracks_region": "Album tracks",
+      "tracks": "Tracks ({count})",
+      "select_all": "Select all ({count})",
+      "deselect_all": "Deselect all",
+      "saved": "Saved: {count, plural, one {# track} other {# tracks}}",
+      "apply": "Apply",
+      "cancel": "Cancel",
+      "invalid_field": "Check “{field}”: {message}",
+      "fill_one": "Fill in at least one field",
+      "applying": "Applying {index}/{total}…",
+      "applied": "Tags applied: {ok, plural, one {# track} other {# tracks}}{fail, select, 0 {} other {, errors: {fail}}}",
+      "common_intro": "Filled fields will be applied to every track in “{title}” ({count, plural, one {# track} other {# tracks}}). Empty fields are not changed; titles, track numbers, and covers are unaffected.",
+      "mixed_placeholder": "album: different values",
+      "current_placeholder": "current: {value}",
+      "unset_placeholder": "not set",
+      "mixed_title": "Tracks in this album have different values for this field",
+      "mixed_aria": "Field “{field}” has different album values",
+      "mixed": "Different values",
+      "use_current_title": "Use the current album value",
+      "use_current_aria": "Use the current value of “{field}”",
+      "cover_intro": "The cover will be applied to every track in “{title}”",
+      "sources_unavailable": "Sources are unavailable",
+      "finding_covers": "Looking for covers in sources…",
+      "choose_cover_aria": "Choose cover: {source}",
+      "cover_from_alt": "Album cover from {source}",
+      "upload_file_aria": "Upload cover file",
+      "uploaded_cover_alt": "Uploaded cover: {name}",
+      "upload_cover": "Upload cover",
+      "upload_hint": "Drop a file or click",
+      "choose_cover_first": "Choose a cover first",
+      "invalid_cover_file": "Choose a JPEG or PNG file",
+      "cover_read_failed": "Could not read the cover file",
+      "cover_applied": "Cover applied: {ok, plural, one {# track} other {# tracks}}{fail, select, 0 {} other {, errors: {fail}}}"
+    },
+    "track_detail": {
+      "close": "Close",
+      "no_lyrics": "No lyrics",
+      "update_lyrics": "Update (LRCLIB)",
+      "lyrics_updated": "Lyrics updated",
+      "lyrics_not_found": "Lyrics not found",
+      "delete_confirm": "Permanently delete this track?",
+      "deleted": "Track deleted",
+      "compress_result": "{label}: done {done}, skipped {skipped}"
+    }
+  },
+  "settings": {
+    "delete": "Delete", "subtitle": "Library · formats · sources · YouTube Music · files · Primuse", "save": "Save", "saved": "Settings saved", "shazam": { "migrated": "Shazam: {count, plural, one {# line moved to the new file} other {# lines moved to the new file}}" },
+    "library": { "subtitle": "Folder and audio formats", "directory": "Directory" }, "format": { "source": "Source format", "source_hint": "Audio format received before conversion to the final format", "output": "Output format", "output_hint": "Format of audio files in the library", "quality": "Quality, kbps" }, "names": { "language": "Filename script", "auto": "Automatic", "cyrillic": "Cyrillic", "latin": "Latin", "hint": "Transliteration for matched names in local Cyrillic and Latin YouTube Music metadata (for example, Валентин Стрыкало / Valentin Strykalo). Automatic keeps the original spelling. English-language names are unchanged." }, "sources": { "title": "Sources", "subtitle": "Metadata search", "drag_title": "Drag to reorder", "order_hint": "Drag ⋮⋮ to set priority: earlier sources take precedence when tags are filled automatically" }, "files": { "title": "Files", "shazam": "Shazam file", "shazam_hint": "One “Title - Artist” entry per line" }, "primuse": { "subtitle": ".lrc and -cover.jpg next to each track", "save": "Save .lrc and -cover.jpg", "create_all": "Create sidecars for the entire library", "delete_all": "Delete .lrc and -cover.jpg", "backfill_summary": "Done: .lrc {lyrics}, covers {covers}, skipped {skipped}", "backfill_done": "Sidecar files created", "cleanup_confirm": "Delete {lyrics} .lrc and {covers} -cover.jpg files (including Inbox)? Tags will not be changed.", "cleanup_summary": "Deleted: .lrc {lyrics}, covers {covers}", "cleanup_done": "Library cleared of sidecar files" },
+    "browse": { "folder_title": "Choose a folder", "error": "Error: {reason}", "loading": "Reading folders…", "folder": "Folder:", "action": "Browse" },
+    "ytm": { "subtitle": "Personal session (likes/albums) and age-restricted videos", "headers_required": "Paste request headers from DevTools", "auth_saved": "Authorization saved", "oauth_required": "Provide client_id and client_secret", "oauth_done": "Done: YouTube Music connected", "oauth_connected": "YouTube Music connected", "no_clips": "Avoid clips: download audio versions (Topic) instead of clips", "status": { "label": "Status", "hint": "browser cookie authorization — extract them below", "disconnected": "not connected — extract browser cookies", "connected": "connected ({mode})", "browser_headers": "browser headers", "login_failed": "login does not work" }, "feedback": { "label": "Accept recommendations as", "hint": "Choose what happens to an accepted recommendation (button or swipe right). A like is a stronger signal: radio adapts faster and the track appears in Likes. Library is quieter: it does not mark the track as liked." }, "remove_auth": { "confirm": "Remove YouTube Music authorization? Account likes and albums will be unavailable again.", "done": "Authorization removed" }, "browser_cookies": { "label": "Browser cookies", "hint": "Find accounts lists personal profiles and YouTube brand channels (for example, …@pages.plusgoogle.com) with their Page ID. Select one from the list. Use the Page ID field if a channel was not recognized (DevTools → Request Headers → X-Goog-PageId).", "browser": "Browser", "profile": "Profile", "not_found": "not found", "profile_not_found": "profile not found", "default_profile": "Primary (Default)" }, "browser_accounts": { "action": "Find accounts", "label": "Account", "auto": "automatic (by likes)", "unnamed": "unnamed", "brand": "brand", "likes": "{count} likes, authuser {authuser}", "found": "Accounts found: {count}", "not_recognized": "Accounts were not recognized: refresh music.youtube.com under the needed account", "not_found": "No accounts found", "unknown": "unknown account", "page_id_placeholder": "Page ID (brand accounts, optional)" }, "browser_extract": { "action": "Extract from browser", "done": "Done: {account} (+{authuser})", "saved": "Cookies saved: {account}" }, "search_source_hint": "Primary source for Search and artist top tracks. YouTube Music searches its catalog and provides tags; yt-dlp still downloads the files. YouTube is ordinary search without authorization.", "checks": { "title": "YouTube checks (18+ and sign-in)", "browser": "Browser for downloads", "browser_hint": "Safari can read profiles too", "status": "Cookie status", "cookies_set": "set ({file})", "cookies_unset": "not set — 18+ videos cannot be downloaded", "cookies_hint": "Get cookies.txt LOCALLY: sign in to youtube.com → Export", "cookies_saved": "Cookies saved ({count} lines)", "cookies_delete_confirm": "Delete saved YouTube cookies? 18+ videos will no longer download.", "cookies_deleted": "Cookies deleted", "login_reading": "Reading… (macOS may ask for Keychain access — choose Allow)", "error": "error", "empty": "empty", "signed_in": "signed in", "signed_out": "not signed in", "no_cookies": "no YouTube cookies", "cookie_count": "{count} cookies", "login_available": "Signed in ({browsers}) — downloads are available", "login_unavailable": "Not signed in: sign in to YouTube in “{browser}” and try again", "age_reading": "Querying YouTube…", "ok": "OK", "age_label": "18+:", "age_verified": "verified", "age_unverified": "not verified", "login_action": "Check sign-in", "login_hint": "The server will read the selected browser storage", "age_action": "Check 18+", "age_hint": "Queries an age-restricted video with every source" }, "alternatives": { "title": "Other sign-in methods", "hint": "Use when automatic browser extraction is unavailable (for example, over remote access)", "headers_label": "Browser headers", "headers_hint": "DevTools: open music.youtube.com → Network → GET /browse → Request Headers, then copy and paste them here", "headers_action": "Paste headers", "oauth_label": "OAuth (YouTube Data API app)", "oauth_action": "Connect OAuth", "oauth_link": "Confirm access using this link:" } },
+    "language": {
+      "label": "Language",
+      "save_failed": "Language changed, but could not be saved"
+    }
+  },
+  "diagnostics": {
+    "health": { "unreadable": "Could not read file", "missing_tag": "Missing tag “{fieldLabel}”", "exact_duplicate": "Exact duplicate (MD5 matches another file)", "semantic_duplicate": "Semantic duplicate “{title}”", "filename_mismatch": "Filename “{filename}” differs from title tag “{title}”", "loose_file": "File is at library root, outside Artist/Album folders" },
+    "lint": { "whitespace": "“{fieldLabel}”: extra spaces in “{value}”", "artist_case": "Artist capitalization “{variant}” differs from “{canonical}”", "album_case": "Album capitalization “{variant}” differs from “{canonical}”", "feat": "Nonstandard featured artist in “{value}” (use “feat.”)", "duplicate_track_number": "“{value}”: duplicate album track number", "invalid_track_number": "“{value}”: invalid track number", "invalid_disc_number": "“{value}”: invalid disc number", "album_artist_conflict": "Album Artist “{value}” conflicts with other tracks in the album", "genre_conflict": "Genre “{value}” differs from other album tracks ({others})", "invalid_year": "Invalid year “{value}”" },
+    "quality": { "change": "{fieldLabel}: “{old}” → “{new}”", "duplicate_field": "Field “{fieldLabel}” was selected for change more than once", "fix_move": "“{filename}” → “{target}”", "file_missing": "File not found", "target_exists": "Target path occupied: {filename}", "write_tags_failed": "Could not write tags", "target_occupied": "Target path occupied" }
+  },
+  "api": {
+    "errors": {
+      "empty_path": "Empty path", "file_not_found": "File not found: {path}", "file_missing": "File not found",
+      "expected_list": "{field} must be a list of sources", "unknown_source": "Unknown source: {source}", "invalid_setting": "Invalid value: {key}",
+      "invalid_transliteration": "Invalid transliteration mode: {value}", "invalid_feedback": "Invalid feedback action: {value}", "invalid_search_source": "Invalid search source: {value}",
+      "unknown_browser": "Unknown browser: {browser} (available: {available})", "invalid_format": "Invalid format: {value}", "invalid_source_format": "Invalid source format: {value}", "quality_out_of_range": "Quality must be between 1 and 512",
+      "invalid_video_id": "Invalid video_id", "directory_not_found": "Directory not found: {path}", "not_directory": "Not a directory", "invalid_pick_kind": "kind must be folder or file", "invalid_authuser": "Invalid authuser", "browser_required": "Select a browser",
+      "oauth_credentials_required": "Provide client_id and client_secret (YouTube Data API app)", "oauth_in_progress": "OAuth is already running; wait for it to finish",
+      "artist_not_found": "Artist not found", "album_not_found": "Album not found", "playlist_not_found": "Playlist not found", "no_tracks": "No tracks", "empty_playlist": "Playlist is empty", "url_required": "URL is required", "empty_url_list": "URL list is empty", "job_not_found": "Job not found",
+      "library_directory_not_found": "Library directory not found", "fields_must_be_object": "fields must be an object", "write_tags_failed": "Could not write tags", "check_fields": "Check the fields", "cover_format": "Only JPEG and PNG are supported", "invalid_cover": "Invalid cover file", "empty_cover": "Cover file is empty", "read_tags_failed": "Could not read tags", "cover_not_found": "No cover art", "move_failed": "Could not move file (name conflict or missing tags)", "invalid_dedup_mode": "Invalid deduplication mode", "no_groups": "No groups", "no_files": "No files", "invalid_line_number": "Invalid line number", "nothing_selected": "Nothing selected", "ytm_connection_required": "Connect YouTube Music (Settings → YouTube Music)", "artist_title_required": "artist and title are required"
+    },
+    "fields": {
+      "year_four_digits": "Year must be four digits, e.g. 2024",
+      "integer_required": "Must be an integer"
+    }
+  }
+}

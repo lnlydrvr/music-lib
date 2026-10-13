@@ -1,0 +1,21 @@
+/* Минимальные дополнения ui-кита: обёртки Sonner под визуальный паритет
+   старого #toast-root (всё остальное — готовые классы styles.css). */
+[data-sonner-toaster] {
+  z-index: 95;
+}
+
+[data-sonner-toaster] ol {
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+[data-sonner-toast] {
+  padding: 0;
+  background: none;
+  border: none;
+  box-shadow: none;
+  font-family: inherit;
+  color: inherit;
+}

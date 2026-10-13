@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>music-lib</title>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<meta name="theme-color" content="#191919">
+<script>
+/* Тема до первой отрисовки: сохранённая → системная → тёмная. Без мигания. */
+try {
+  var _t = localStorage.getItem("music-lib-theme") || localStorage.getItem("music-dl-theme");
+  if (_t !== "light" && _t !== "dark") {
+    _t = matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+  }
+  try { localStorage.setItem("music-lib-theme", _t); } catch (e) { /* ignore */ }
+  document.documentElement.dataset.theme = _t;
+} catch (e) { document.documentElement.dataset.theme = "dark"; }
+</script>
+</head>
+<body>
+<div id="root"></div>
+<script type="module" src="/src/main.tsx"></script>
+</body>
+</html>

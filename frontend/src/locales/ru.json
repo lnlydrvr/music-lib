@@ -1,0 +1,449 @@
+{
+  "common": {
+    "loading": "Загрузка…",
+    "progress_aria": "Ход выполнения операции",
+    "cover_alt": "Обложка: {title}",
+    "empty_value": "—",
+    "errors": {
+      "unavailable": "Что-то пошло не так"
+    }
+  },
+  "pipeline": { "aria": "Этапы операции", "stage_aria": "{label}: {state}", "expected": "ожидает", "running": "выполняется", "done": "готово", "error": "ошибка", "skipped": "пропущен" },
+  "queue": { "done": "Готово", "error": "Ошибка", "dismissed": "Убрано из очереди", "undo": "Вернуть" },
+  "nav": {
+    "home": "Главная",
+    "library": "Библиотека",
+    "search": "Поиск",
+    "recommendations": "Рекомендации",
+    "issues": "Проблемы",
+    "settings": "Настройки"
+  },
+  "shell": {
+    "more": "Ещё",
+    "skip_to_content": "Перейти к содержимому",
+    "nav": {
+      "main_aria": "Основная навигация",
+      "mobile_aria": "Мобильная навигация",
+      "more_aria": "Дополнительная навигация"
+    },
+    "stats": {
+      "health_title": "Здоровье библиотеки (треки без проблем)",
+      "tracks": "{count, plural, one {# трек} few {# трека} many {# треков} other {# трека}} · {size}"
+    },
+    "theme": {
+      "switch": "Переключить тему",
+      "light": "светлая",
+      "dark": "тёмная"
+    },
+    "command": {
+      "label": "Палитра команд",
+      "search": "Поиск команды…",
+      "empty": "Ничего не найдено",
+      "navigate": "Переход",
+      "actions": "Действия"
+    }
+  },
+  "dialogs": {
+    "confirm": {
+      "title": "Подтверждение"
+    },
+    "prompt": {
+      "title": "Ввод"
+    },
+    "yes": "Да",
+    "cancel": "Отмена",
+    "ok": "ОК",
+    "close": "Закрыть",
+    "close_aria": "Закрыть диалог",
+    "keymap": {
+      "title": "Горячие клавиши",
+      "command": "Палитра команд",
+      "navigation": "Главная / Библиотека / Поиск / Рекомендации / Проблемы / Настройки",
+      "theme": "Тёмная / светлая тема",
+      "this_list": "Этот список",
+      "dismiss": "Закрыть диалог / список",
+      "enter": "Поиск / выбрать",
+      "next_track": "Следующий / предыдущий трек в списке"
+    }
+  },
+  "player": {
+    "preview": "Превью",
+    "close": "Закрыть плеер",
+    "play": "Воспроизвести",
+    "pause": "Пауза",
+    "position": "Позиция воспроизведения",
+    "listen": "Прослушать",
+    "listen_track": "Прослушать: {title}"
+  },
+  "jobs": {
+    "common": {
+      "done": "Готово",
+      "failed": "Ошибка"
+    },
+    "dock": {
+      "launching": "Запуск...",
+      "empty": "Нет активных задач",
+      "active": "Загрузки · {count} · {percent}%",
+      "failed": "Загрузки · ошибка ({count})",
+      "ready": "Загрузки · готово",
+      "title": "Загрузки",
+      "clear": "Очистить",
+      "clear_title": "Убрать завершённые",
+      "clear_aria": "Убрать завершённые задачи",
+      "expand": "Загрузки: развернуть",
+      "collapse": "Загрузки: свернуть",
+      "background_aria": "Фоновые задачи",
+      "dismiss": "Убрать",
+      "dismiss_item": "Убрать: {title}",
+      "fallback_name": "Фоновая задача"
+    },
+    "auth": { "extract_name": "Извлечение кук браузера", "accounts_name": "Поиск аккаунтов в браузере", "oauth_name": "OAuth YouTube Music", "read_cookies": "Читаю куки браузера…", "saved_checking": "Авторизация сохранена. Проверяем аккаунт…", "confirmation_link": "Ссылка для подтверждения получена", "creating_session": "Создание OAuth-сессии…" },
+    "ytm": { "name": "YouTube Music — скачивание", "item": "[{index}/{total}] {label}", "clip_missing": "[{index}/{total}] {label} (клип — аудиоверсия не найдена)", "bytes": "{label} — {sizeMb} МБ", "item_failed": "[{index}/{total}] ошибка: {label}", "item_downloaded": "[{index}/{total}] скачано: {label}" },
+    "download": { "name": "Скачивание", "batch_name": "Пакетное скачивание", "fetching_info": "Получение информации о видео...", "bytes": "Скачивание... {sizeMb} МБ", "tagging": "Скачано, обработка тегов...", "batch_progress": "[{index}/{total}] {name} — {sizeMb} МБ", "batch_finished": "[{index}/{total}] {name} — завершено", "batch_item": "[{index}/{total}] {url}…", "unknown_error": "Неизвестная ошибка", "failed": "Ошибка скачивания", "batch_complete": "[{index}/{total}] {label}" },
+    "shazam": { "scan_name": "Shazam — поиск", "download_name": "Shazam — скачивание", "scanning": "Поиск {count, plural, one {# трека} few {# треков} many {# треков} other {# трека}} в YouTube Music…", "processed": "Обработан {index}/{total}", "file_missing": "Файл Shazam не задан или не найден — укажите путь в настройках", "empty_file": "Файл пуст или не содержит распознанных треков", "file_unset": "Файл Shazam не задан" },
+    "recommend": { "name": "Рекомендации", "scanning": "Сканирование библиотеки...", "radio": "Радио YouTube Music...", "seed": "Обработан сид {index} из {total}" },
+    "library": {
+      "sort_name": "Сортировка библиотеки"
+    },
+    "lyrics": { "name": "Обновление текстов", "item": "[{index}/{total}] {filename}" },
+    "compress": { "name": "Сжатие", "item": "[{index}/{total}]", "audio_result": "Сжато аудио", "cover_result": "Пережато обложек" },
+    "primuse": { "backfill_name": "Primuse — sidecars", "cleanup_name": "Primuse — очистка", "scanning": "Сканирование sidecar-файлов...", "backfill_item": "[{index}/{total}] {filename}" }
+  },
+  "home": {
+    "find_music": "Найти музыку",
+    "subtitle": "библиотека музыки, теги, тексты и отчёты", "tidy": "Навести порядок",
+    "recent": { "title": "Последние добавленные", "empty": "Пока пусто", "empty_hint": "Найдите музыку во вкладке «Поиск»" },
+    "stats": { "duration": "Длительность", "size": "Размер", "title": "Статистика", "genres": "Жанры" },
+    "health": { "title": "Здоровье", "ok": "Всё в порядке" }, "shazam": { "queued": "В очереди: {count}", "file_unconfigured": "Файл не настроен" }
+  },
+  "ytm": {
+    "empty": "Ничего не найдено",
+    "tracks": {
+      "count": "{count, plural, one {# трек} few {# трека} many {# треков} other {# трека}}"
+    },
+    "cover_alt": "Обложка: {title}",
+    "radio": {
+      "title": "Похожие (радио)",
+      "track_aria": "Похожие: {title}",
+      "button": "Радио"
+    },
+    "download": {
+      "title": "Скачать",
+      "track_aria": "Скачать: {title}",
+      "archive": "Архив: {name}",
+      "completed": "Скачано: {count}", "album_name": "Альбом: {title}", "artist_name": "Исполнитель: {title}", "youtube_name": "YouTube: {title}", "playlist_name": "Плейлист: {title}", "radio_name": "Радио: {title}",
+      "all_missing": "Скачать отсутствующие ({count})",
+      "popular": "Скачать популярные ({count})",
+      "already_in_library": "Всё уже в библиотеке"
+    },
+    "artist": {
+      "local_count": "{count} в библиотеке"
+    },
+    "back": "← Назад", "loading_album": "Загрузка альбома…", "loading_artist": "Загрузка исполнителя…", "loading_playlist": "Загрузка плейлиста…", "album": "Альбом", "artist_label": "Исполнитель", "albums": "Альбомы", "popular": "Популярные песни", "top_tracks": "Топ треков", "finding_popular": "Ищем популярное…", "not_found": "Ничего не нашлось", "playlist": "Плейлист", "similar": "Похожие:", "similar_empty": "Похожих треков не нашлось", "close_aria": "Закрыть", "track_number": "Номер трека", "source": "Источник", "in_library": "В библиотеке", "clip": "клип", "clip_title": "Это клип, а не аудиоверсия", "track_in_library": "Трек уже в локальной библиотеке", "album_in_library": "Альбом в локальной библиотеке", "album_partial": "Альбом сохранён частично — часть треков есть на YouTube Music", "album_missing": "В локальной библиотеке нет", "no_tracks": "пусто", "album_none": "нет", "short_tracks": "{count} тр.", "subscribers": "{value} подписч.", "album_aria": "Альбом: {title}{artist}", "album_cover": "Обложка альбома: {title}", "artist_aria": "Исполнитель: {name}", "artist_photo": "Фото: {name}", "files_in_library": "Файлы в локальной библиотеке", "subscribed": "подписан", "subscription": "Подписка на YouTube Music"
+  },
+  "discover": { "tabs_aria": "Загрузка: разделы", "search": "Поиск", "shazam": "Shazam" },
+  "search": { "title": "Поиск и скачивание", "subtitle": "Ищите музыку на YouTube или YouTube Music и скачивайте её в выбранном формате", "source": "Источник поиска", "query": "Запрос на YouTube или URL", "placeholder": "Запрос на YouTube или URL (видео / плейлист / аудио)", "action": "Поиск", "searching": "Поиск…", "processing": "Обработка…", "results_ytm": "Результаты (YouTube Music): {query}", "results_yt": "Результаты: {query}", "download": "Скачать", "download_aria": "Скачать: {title}", "in_library": "в библиотеке", "failed": "Поиск не удался: {message}", "retry": "Попробовать снова", "playlist": "Плейлист ({count, plural, one {# трек} few {# трека} many {# треков} other {# трека}})", "select": "Выбрать: {title}", "channel": "Канал", "duration": "Длит.", "all": "Все", "none": "Ничего", "download_selected": "Скачать выбранные ({count})", "more": "Показать ещё 10 (показано {count})", "empty": "Ничего не найдено", "empty_hint": "Попробуйте другой запрос или вставьте прямую ссылку", "yt_note": "Скачивание идёт в формате из настроек; после — предложение метаданных из iTunes/Deezer.", "ytm_note": "Теги — из YouTube Music (альбом, обложка), файл — в формате из настроек; после — предложение метаданных из iTunes/Deezer.", "metaflow": { "metadata_searching": "Поиск метаданных в источниках…", "confirm": "Загрузить метаданные из источников?", "skip": "Пропустить", "lyrics_updating": "Обновление текста (LRCLIB)…", "moving": "Перенос в библиотеку…", "moved": "Готово: {path}", "added_to_library": "Трек добавлен в библиотеку", "downloaded_processing": "Скачано, постобработка…" }, "batch": { "title": "Пакет: {count, plural, one {# трек} few {# трека} many {# треков} other {# трека}}", "completed": "Скачано: {downloaded}, ошибок: {failed}" } },
+  "editor": {
+    "saved": "Теги сохранены", "load_error": "Ошибка", "loading": "Загрузка...", "cover": "Обложка", "current_cover": "Текущая обложка", "current_cover_alt": "Текущая обложка трека", "source_cover": "Обложка источника", "source_cover_alt": "Обложка выбранного источника", "apply_cover": "Применить обложку", "cover_not_found": "Обложка не найдена", "source": "Источник", "restore_title": "Вернуть исходное значение из файла", "restore_aria": "Вернуть исходное значение поля {field}", "searching_sources": "Поиск в источниках...", "sources_not_found": "Источники не найдены", "album_tags": "Теги альбома", "album_tags_with_album": "Теги альбома: {album}", "source_record": "Запись источника", "select_source": "Выбрать источник: {source}", "searching_in": "Ищу в {source}…",
+    "groups": { "Основное": "Основное", "Релиз": "Релиз", "Прочее": "Прочее" },
+    "dialog": { "title": "Редактор: {title}", "untitled": "трек", "save": "Сохранить", "cancel": "Отмена" },
+    "batch": { "title": "Массовое редактирование метаданных", "done": "Готово", "saved": "{count, plural, one {Теги сохранены} few {Сохранено треков: #} many {Сохранено треков: #} other {Сохранено треков: #}}", "select_source_first": "Сначала выберите источник для текущего трека", "applying": "Применяю {index}/{total}…", "applied": "Применено: {applied}{failed, select, 0 {} other {, ошибок: {failed}}}", "tracks": "Треки ({count})", "apply_source_title": "Разнести выбранный на текущем треке источник на все треки", "apply_source_aria": "Применить выбранный источник ко всем трекам", "apply_all": "Применить ко всем трекам", "list_aria": "Треки для редактирования", "unsaved_aria": "{title} (есть несохранённые изменения)" },
+    "sources_unavailable": "Источники недоступны", "sources_unavailable_reason": "Источники недоступны: {reason}",
+    "fields": {
+      "title": "Название",
+      "artist": "Исполнитель",
+      "album": "Альбом",
+      "album_artist": "Исполнитель альбома",
+      "year": "Год",
+      "genre": "Жанр",
+      "isrc": "ISRC",
+      "composer": "Композитор",
+      "publisher": "Издатель / Лейбл",
+      "comment": "Комментарий",
+      "track_number": "№ трека",
+      "disc_number": "№ диска",
+      "cover": "Обложка"
+    }
+  },
+  "quality": {
+    "selection": {
+      "required": "Отметьте треки флажками на карточках",
+      "toolbar": "Действия с выбранными треками",
+      "track_aria": "Выбрать: {name}",
+      "select_all": "Выбрать все ({count})"
+    },
+    "refreshing": "Обновление списка…",
+    "refresh": "Обновить",
+    "lyrics_item_progress": "[{completed}/{total}] {path}",
+    "lyrics": {
+      "update_action": "Обновить", "action": "Тексты",
+      "singular": "Текст"
+    },
+    "category": {
+      "unreadable": "Нечитаемые файлы", "missing": "Незаполненные теги", "duplicates": "Дубликаты", "mismatch": "Имя файла ≠ тег", "loose": "Файлы вне папок", "whitespace": "Лишние пробелы", "case": "Регистр", "feat": "Feat-исполнители", "tracknum": "Номера треков", "album_artist": "Исполнитель альбома", "genre": "Жанр", "year": "Год", "track_number": "Номера треков", "disc_number": "Номера дисков", "global_genre": "Общие жанры"
+    },
+    "cause": {
+      "track_number": "Номера треков", "disc_number": "Номера дисков", "album_artist": "Исполнитель альбома", "global_genre": "Общие жанры"
+    },
+    "screen": {
+      "title": "Проблемы библиотеки", "subtitle": "единый отчёт: файлы, теги и предлагаемые исправления", "include_inbox": "Включая Inbox", "normalize": "Нормализовать", "reset": "Сбросить", "field": "Поле", "file": "Файл", "old": "Было", "new": "Станет", "checked": "Проверено треков: {count}", "problems": "Проблем: {count}", "auto_fixes": "Авто-исправления: {count}", "none": "Проблем не найдено", "show_all": "Показать все", "empty_filter": "Нет треков с выбранными категориями", "fix": "Исправить", "editor": "Редактор", "auto_fixes_title": "Столько изменений предложит автоисправление", "auto_fixes_badge": "авто-исправления: {count}", "normalization_plan": "План нормализации — {count}", "apply_title": "Применить изменения?", "tag_changes": "Изменения тегов — {count}", "files": "Файлы — {count}", "conflicts": "Конфликты — {count}", "conflicts_hint": "эти элементы будут пропущены, остальное применится", "action": "Действие", "destination": "Куда", "move": "Перенос", "rename": "Переименовать", "obstacle": "Препятствие", "apply": "Применить ({count})", "cancel": "Отмена", "selected": "Выбрано: {count}", "deselect_all": "Снять выделение ({count})", "show_category": "Показать категорию: {label}", "hide_category": "Скрыть категорию: {label}", "lyrics_updated": "Текст обновлён", "lyrics_missing": "Текст не найден", "no_auto_changes": "Автоматических изменений для выбранных треков нет", "apply_summary": "Применено: {applied}, пропущено: {skipped}{notes}", "conflict_note": "конфликтов: {count}", "error_note": "ошибок: {count}", "select_tracks": "Отметьте треки флажками на карточках", "saved": "Сохранено: {count} трек(ов)", "update_lyrics": "Обновить тексты для {count} трек(ов)?", "updating": "Обновить", "lyrics_progress": "Обновлено: {updated}, не найдено: {missed}{errors}", "refreshing": "Обновление списка…", "category_count": "{label} ({count})", "track_changes": "Выбрать: {name}"
+    }
+  },
+  "library": {
+    "subtitle": "все файлы, теги, обложки и тексты",
+    "tabs": {
+      "albums": "Альбомы",
+      "tracks": "Треки",
+      "artists": "Исполнители",
+      "playlists": "Плейлисты"
+    },
+    "views_aria": "Представления библиотеки",
+    "albums": {
+      "shown": "Показано {shown} из {total} альбомов",
+      "count": "{count, plural, one {# альбом} few {# альбома} many {# альбомов} other {# альбома}}"
+    },
+    "artists": {
+      "count": "{count, plural, one {# исполнитель} few {# исполнителя} many {# исполнителей} other {# исполнителя}}"
+    },
+    "tracks": {
+      "shown": "Показано {shown} из {total}"
+    },
+    "playlists": {
+      "count": "{count, plural, one {# плейлист} few {# плейлиста} many {# плейлистов} other {# плейлиста}}",
+      "disconnected": "YouTube Music не подключён: подключите в «Настройках»",
+      "none": "Плейлистов не сохранено"
+    },
+    "cloud": {
+      "more": " · ещё {count} на YT Music",
+      "only": "{count} на YT Music"
+    },
+    "empty": "Библиотека пуста",
+    "empty_hint": "Найдите музыку и скачайте — файлы появятся здесь",
+    "detail": {
+      "heading": "Информация",
+      "choose_track": "Выберите трек"
+    },
+    "filters": {
+      "no_results": "Ничего не найдено по фильтру",
+      "search_placeholder": "Найти…",
+      "search_aria": "Поиск по названию, исполнителю, альбому",
+      "clear_search": "Очистить поиск",
+      "label": "Фильтр:",
+      "all_artists": "Все исполнители",
+      "artist_aria": "Фильтр по исполнителю",
+      "all_albums": "Все альбомы",
+      "album_aria": "Фильтр по альбому",
+      "all_genres": "Все жанры",
+      "genre_aria": "Фильтр по жанру",
+      "missing_lyrics": "нет текста",
+      "needs_compression": "нужно сжать",
+      "reset": "Сбросить"
+    },
+    "compress": {
+      "needed": "нужно ({before} → {after})",
+      "ok": "ок",
+      "needed_short": "сжать",
+      "confirm": "Сжать {count, plural, one {# трек} few {# трека} many {# треков} other {# трека}} до качества из настроек?",
+      "action": "Сжать",
+      "selected_action": "Сжать выбранные"
+    },
+    "ytm": {
+      "liked_title": "Лайк в YouTube Music"
+    },
+    "card": {
+      "open_track_aria": "Открыть детали: {name}",
+      "format_title": "Формат",
+      "bitrate_title": "Битрейт",
+      "ytm_aria": "YouTube Music: {name}",
+      "clip_title": "Клип на YouTube Music",
+      "open_album_artist_aria": "Открыть альбом: {title} — {artist} ({have} из {total} тр.)",
+      "open_album_aria": "Открыть альбом: {title} ({have} из {total} тр.)",
+      "album_cover_alt": "Обложка альбома: {name}",
+      "artist_aria": "Исполнитель: {name} ({count} тр.)"
+    },
+    "artist": {
+      "files": "{count, plural, one {# файл} few {# файла} many {# файлов} other {# файла}}"
+    },
+    "inbox": {
+      "moved_to": "Перенесено: {path}",
+      "move_confirm": "Перенести {count, plural, one {# файл} few {# файла} many {# файлов} other {# файла}} из Inbox в Artist/Album по тегам?",
+      "move_action": "Перенести",
+      "item_progress": "{index}/{total}: {title}",
+      "move_summary": "Перенесено: {count}",
+      "move_summary_errors": "Перенесено: {count}, ошибок: {failed}",
+      "delete_all_title": "Удалить всё из Inbox",
+      "delete_confirm": "Удалить безвозвратно {count, plural, one {# файл} few {# файла} many {# файлов} other {# файла}}?",
+      "delete_warning": "Файлы стираются с диска — восстановить нельзя",
+      "delete_all": "Удалить все",
+      "delete_item_progress": "{index}/{total}",
+      "delete_summary": "Удалено: {count}",
+      "delete_summary_errors": "Удалено: {count}, ошибок: {failed}",
+      "move_all_aria": "Перенести все файлы Inbox в библиотеку ({count})",
+      "move_all": "Перенести все ({count})",
+      "delete_all_aria": "Удалить все файлы Inbox ({count})",
+      "heading": "Inbox — файлы вне папок ({count})"
+    },
+    "selection": {
+      "tags": "Теги",
+      "saved": "Сохранено: {count, plural, one {# трек} few {# трека} many {# треков} other {# трека}}",
+      "tags_action": "Теги выбранных",
+      "badge": "выбрано {count}",
+      "count": "Выбрано {count}",
+      "deselect_all": "Снять все"
+    },
+    "track": {
+      "meta_action": "Мета",
+      "compression_label": "Сжатие",
+      "edit_tags": "Редактировать теги",
+      "delete_action": "Удалить трек"
+    },
+    "album_detail": {
+      "region": "Альбом",
+      "back": "← Назад",
+      "cover_alt": "Обложка альбома: {title}",
+      "fill_tags_title": "Заполнить теги всего альбома из одного источника",
+      "fill_tags": "Выбрать теги для альбома",
+      "common_tags_title": "Задать общие теги (исполнитель, альбом, год и другие) сразу для всех треков",
+      "common_tags": "Общие теги альбома",
+      "cover_title": "Выбрать обложку из источников для всех треков альбома",
+      "cover": "Обложка для альбома",
+      "genres": "Жанры",
+      "missing": "Не хватает в локальной библиотеке ({count})",
+      "download_all_title": "Скачать все недостающие треки",
+      "download_all": "Скачать все ({count})",
+      "download_name": "Альбом: {title}",
+      "tracks_region": "Треки альбома",
+      "tracks": "Треки ({count})",
+      "select_all": "Выбрать все ({count})",
+      "deselect_all": "Снять все",
+      "saved": "Сохранено: {count, plural, one {# трек} few {# трека} many {# треков} other {# трека}}",
+      "apply": "Применить",
+      "cancel": "Отмена",
+      "invalid_field": "Проверьте поле «{field}»: {message}",
+      "fill_one": "Заполните хотя бы одно поле",
+      "applying": "Применяю {index}/{total}…",
+      "applied": "Теги применены: {ok, plural, one {# трек} few {# трека} many {# треков} other {# трека}}{fail, select, 0 {} other {, ошибок: {fail}}}",
+      "common_intro": "Заполненные поля применятся ко всем трекам альбома «{title}» ({count, plural, one {# трек} few {# трека} many {# треков} other {# трека}}). Пустые поля не изменяются; названия, номера треков и обложки не затрагиваются.",
+      "mixed_placeholder": "в альбоме: разные значения",
+      "current_placeholder": "сейчас: {value}",
+      "unset_placeholder": "не задано",
+      "mixed_title": "У треков альбома в этом поле разные значения",
+      "mixed_aria": "У поля «{field}» в альбоме разные значения",
+      "mixed": "Разные значения",
+      "use_current_title": "Подставить текущее значение альбома",
+      "use_current_aria": "Подставить текущее значение поля «{field}»",
+      "cover_intro": "Обложка применится ко всем трекам альбома «{title}»",
+      "sources_unavailable": "Источники недоступны",
+      "finding_covers": "Ищу обложки в источниках...",
+      "choose_cover_aria": "Выбрать обложку: {source}",
+      "cover_from_alt": "Обложка альбома из {source}",
+      "upload_file_aria": "Загрузить файл обложки",
+      "uploaded_cover_alt": "Загруженная обложка: {name}",
+      "upload_cover": "Загрузить обложку",
+      "upload_hint": "Перетащите файл или нажмите",
+      "choose_cover_first": "Сначала выберите обложку",
+      "invalid_cover_file": "Выберите файл JPEG или PNG",
+      "cover_read_failed": "Не удалось прочитать файл обложки",
+      "cover_applied": "Обложка применена: {ok, plural, one {# трек} few {# трека} many {# треков} other {# трека}}{fail, select, 0 {} other {, ошибок: {fail}}}"
+    },
+    "track_detail": {
+      "close": "Закрыть",
+      "no_lyrics": "Нет текста",
+      "update_lyrics": "Обновить (LRCLIB)",
+      "lyrics_updated": "Текст обновлён",
+      "lyrics_not_found": "Текст не найден",
+      "delete_confirm": "Удалить трек безвозвратно?",
+      "deleted": "Трек удалён",
+      "compress_result": "{label}: сделано {done}, пропущено {skipped}"
+    },
+    "density": {
+      "grid": "Сетка",
+      "compact": "Компакт",
+      "list": "Список",
+      "aria": "Плотность сетки"
+    },
+    "more_actions": "Ещё действия",
+    "refresh_aria": "Обновить библиотеку",
+    "lyrics": {
+      "confirm_all": "Обновить синхронные тексты? Уже имеющие синхронный текст треки будут пропущены.",
+      "preparing": "Подготавливаем список текстов…",
+      "summary": "Обновлено: {updated}, пропущено: {skipped}, ошибок: {errors}",
+      "update_title": "Обновить тексты",
+      "update_aria": "Обновить тексты песен"
+    },
+    "sort": {
+      "already_sorted": "Всё уже разложено по папкам",
+      "title": "Разложить по папкам",
+      "move_count": "Переместить файлов: {count}",
+      "move_count_truncated": "Переместить файлов: {count} (показаны первые {shown})",
+      "explanation": "перенос в Artist/Album по тегам; пустые папки будут удалены",
+      "action": "Сортировать",
+      "summary": "Перемещено: {moved}, удалено папок: {removed}",
+      "control_title": "Сортировка",
+      "control_aria": "Сортировка треков",
+      "by_title": "По названию",
+      "by_artist": "По исполнителю",
+      "by_size": "По размеру",
+      "folders_aria": "Разложить по папкам Artist/Album"
+    },
+    "dedup": {
+      "mode": "Режим дедупликации",
+      "exact": "Точное совпадение (MD5)",
+      "semantic": "Семантическое (название + исполнитель)",
+      "find": "Найти",
+      "none": "Дубликаты не найдены",
+      "instructions": "Найдено групп: {count}. Выберите файлы для удаления.",
+      "group": "Группа:",
+      "best": "лучший",
+      "delete_selected": "Удалить выбранные",
+      "deleted": "Удалено: {count}",
+      "find_action": "Найти дубликаты"
+    },
+    "merge": {
+      "none": "Альбомов с несколькими треками не найдено",
+      "title": "Объединить альбомы",
+      "instructions": "Найдено альбомов: {count}. Выберите альбомы для объединения.",
+      "mixed": "разные исполнители",
+      "album_meta": "{count, plural, one {# трек} few {# трека} many {# треков} other {# треков}} · {artists}",
+      "selected": "Объединить выбранные",
+      "album_artist_prompt": "Исполнитель альбома для альбомов с разными исполнителями",
+      "merged": "Объединено: {count}"
+    }
+  },
+  "recommend": {
+    "title": "Рекомендации по библиотеке", "subtitle": "Рекомендации на основе вашей библиотеки. Лайки, дизлайки и сохранение отправляются в YouTube Music", "info": "Библиотека: {library} треков · рекомендаций: {total}", "counter": "{current} из {total}", "refresh": "Обновить рекомендации", "open_settings": "Открыть настройки", "similar": "похоже на: {seed}", "hint": "{dislike} · {apply} · кнопки ниже", "dislike": "Дизлайк", "dislike_overlay": "ДИЗЛАЙК", "dislike_done": "Дизлайк отправлен — радио это учтёт", "dislike_swipe": "◀ свайп — дизлайк", "dislike_key": "← дизлайк", "skip": "Пропустить", "disconnected": "YouTube Music не подключён", "seeds": { "collecting": "Сбор сидов..." }, "streaming": { "title": "Обрабатываем следующие сиды", "hint": "карточки появятся по мере обработки" }, "empty": { "title": "Рекомендаций больше нет", "hint": "радио YouTube Music обновится позже" },
+    "apply": { "library": "В библиотеку", "library_overlay": "В БИБЛИОТЕКУ", "library_done": "Сохранено в библиотеку YouTube Music", "library_hint": "свайп ▶ — в библиотеку", "library_hint_key": "→ в библиотеку", "like": "Лайк", "like_overlay": "ЛАЙК", "like_done": "Лайк отправлен в YouTube Music", "like_hint": "свайп ▶ — лайк", "like_hint_key": "→ лайк" }
+  },
+  "shazam": { "subtitle": "Поиск музыки по списку «Название — Исполнитель». Совпадения ищутся в YouTube Music, при необходимости — на YouTube.", "search": "Найти совпадения", "searching": "Поиск совпадений…", "unconfigured": "Файл Shazam не настроен", "unconfigured_hint": "Укажите путь к файлу со списком «Название — Исполнитель» в настройках", "open_settings": "Открыть настройки", "file": "Файл: {path}", "duration": "Длит.", "download_hint": "Скачивание идёт в формате из настроек. Затем можно загрузить метаданные из iTunes/Deezer, текст и перенести трек в библиотеку. После скачивания строка трека удаляется из файла.", "match": "{duration} · совпадение {score}%", "no_matches": "Совпадений в YouTube Music не найдено", "stage": { "metadata": "Метаданные", "lyrics": "Текст", "library": "В библиотеку" }, "remove": { "title": "Удалить строку с треком из файла", "aria": "Удалить строку: {entry}", "action": "Удалить строку", "confirm": "Удалить строку с треком из файла?", "done": "Удалено строк: {count}" } },
+  "settings": {
+    "delete": "Удалить", "subtitle": "Каталог · форматы · источники · YouTube Music · файлы · Primuse", "save": "Сохранить", "saved": "Настройки сохранены", "shazam": { "migrated": "Shazam: {count, plural, one {# строка перенесена в новый файл} few {# строки перенесены в новый файл} many {# строк перенесено в новый файл} other {# строки перенесены в новый файл}}" },
+    "library": { "subtitle": "Папка и форматы аудио", "directory": "Каталог" }, "format": { "source": "Формат источника", "source_hint": "Формат аудио, который будет получен перед конвертацией в конечный формат", "output": "Конечный формат", "output_hint": "Формат аудиофайла в библиотеке", "quality": "Качество, кбит/с" }, "names": { "language": "Язык имён", "auto": "Авто", "cyrillic": "Кириллица", "latin": "Латиница", "hint": "Транслитерация для совпавших пар «локальная кириллица + латиница YT Music» (Валентин Стрыкало / Valentin Strykalo). Авто — как в оригинале. Англоязычные имена не меняются." }, "sources": { "title": "Источники", "subtitle": "Поиск метаданных", "drag_title": "Перетащить", "order_hint": "Перетащите ⋮⋮, чтобы задать приоритет: первые источники выигрывают при автоподстановке тегов" }, "files": { "title": "Файлы", "shazam": "Файл Shazam", "shazam_hint": "«Название - Исполнитель» по строке" }, "primuse": { "subtitle": ".lrc и -cover.jpg рядом с треком", "save": "Сохранять .lrc и -cover.jpg", "create_all": "Создать sidecar всей библиотеке", "delete_all": "Удалить .lrc и -cover.jpg", "backfill_summary": "Готово: .lrc {lyrics}, обложек {covers}, пропущено {skipped}", "backfill_done": "Sidecar-файлы созданы", "cleanup_confirm": "Удалить {lyrics} .lrc и {covers} -cover.jpg (включая Inbox)? Теги не изменятся.", "cleanup_summary": "Удалено: .lrc {lyrics}, обложек {covers}", "cleanup_done": "Библиотека очищена от sidecar-файлов" },
+    "browse": { "folder_title": "Выбор папки", "error": "Ошибка: {reason}", "loading": "Читаю папки…", "folder": "Папка:", "action": "Обзор" },
+    "ytm": { "subtitle": "личная сессия (лайки/альбомы) + возрастные видео", "headers_required": "Вставьте заголовки запроса из DevTools", "auth_saved": "Авторизация сохранена", "oauth_required": "Заполните client_id и client_secret", "oauth_done": "Готово: YouTube Music подключён", "oauth_connected": "YouTube Music подключён", "no_clips": "Избегать клипов: качать аудиоверсии (Topic) вместо клипов", "status": { "label": "Статус", "hint": "авторизация через cookie браузера — извлеките их ниже", "disconnected": "не подключено — извлеките куки из браузера", "connected": "подключено ({mode})", "browser_headers": "заголовки браузера", "login_failed": "вход не работает" }, "feedback": { "label": "Принимать рекомендации как", "hint": "Что делать с принятым треком на экране рекомендаций (кнопка и свайп вправо). Лайк — сильный сигнал: радио подстраивается быстрее, трек виден в «Нравится». Библиотека — тише: без пометки «нравится» в аккаунте." }, "remove_auth": { "confirm": "Удалить авторизацию YouTube Music? Лайки и альбомы аккаунта снова будут недоступны.", "done": "Авторизация удалена" }, "browser_cookies": { "label": "Куки из браузера", "hint": "«Найти аккаунты» покажет личные профили и страничные каналы YouTube (brand, например …@pages.plusgoogle.com) с их Page ID. Выберите нужный в списке. Ручное поле Page ID ниже — на случай, если канал не распознался (DevTools → Request Headers → X-Goog-PageId).", "browser": "Браузер", "profile": "Профиль", "not_found": "не найдено", "profile_not_found": "профиль не найден", "default_profile": "Основной (Default)" }, "browser_accounts": { "action": "Найти аккаунты", "label": "Аккаунт", "auto": "авто (по лайкам)", "unnamed": "без имени", "brand": "страничный", "likes": "{count} лайков, authuser {authuser}", "found": "Найдено аккаунтов: {count}", "not_recognized": "Аккаунты не распознаны: обновите music.youtube.com под нужной учёткой", "not_found": "Аккаунты не найдены", "unknown": "неизвестный аккаунт", "page_id_placeholder": "Page ID (бренд/страничные аккаунты, опционально)" }, "browser_extract": { "action": "Извлечь из браузера", "done": "Готово: {account} (+{authuser})", "saved": "Куки сохранены: {account}" }, "search_source_hint": "Основной источник на экране поиска и топа треков исполнителя. YouTube Music — поиск по каталогу YT Music и теги из него; файлы всё равно качает yt-dlp. YouTube — обычный поиск без авторизации.", "checks": { "title": "Проверки YouTube (18+ и вход)", "browser": "Браузер для скачивания", "browser_hint": "Safari читает и профили", "status": "Статус cookies", "cookies_set": "заданы ({file})", "cookies_unset": "не заданы — видео 18+ качаться не будут", "cookies_hint": "«Get cookies.txt LOCALLY»: откройте youtube.com залогиненным → Export", "cookies_saved": "Cookies сохранены ({count} строк)", "cookies_delete_confirm": "Удалить сохранённые YouTube-cookies? Видео 18+ снова качаться не будут.", "cookies_deleted": "Cookies удалены", "login_reading": "Читаю… (macOS может спросить доступ к связке ключей — нажмите Allow)", "error": "ошибка", "empty": "пусто", "signed_in": "вход", "signed_out": "без входа", "no_cookies": "cookies YouTube нет", "cookie_count": "{count} шт", "login_available": "Вход есть ({browsers}) — можно качать", "login_unavailable": "Входа нет: войдите в YouTube в «{browser}» и повторите", "age_reading": "Запрашиваю YouTube…", "ok": "ок", "age_label": "18+:", "age_verified": "подтверждены", "age_unverified": "не подтверждены", "login_action": "Проверить вход", "login_hint": "Сервер прочитает хранилище выбранного браузера", "age_action": "Проверить 18+", "age_hint": "Запросит age-видео каждым источником" }, "alternatives": { "title": "Другие способы входа", "hint": "Если автоизвлечение из браузера недоступно (например, при удалённом доступе)", "headers_label": "Заголовки браузера", "headers_hint": "DevTools: открыт music.youtube.com → Network → GET /browse → Request Headers, скопируйте и вставьте сюда", "headers_action": "Вставить заголовки", "oauth_label": "OAuth (приложение YouTube Data API)", "oauth_action": "Подключить OAuth", "oauth_link": "Подтвердите доступ по ссылке:" } },
+    "language": {
+      "label": "Язык",
+      "save_failed": "Язык изменён, но сохранить выбор не удалось"
+    }
+  },
+  "diagnostics": {
+    "health": { "unreadable": "Не удалось прочитать файл", "missing_tag": "Нет тега «{fieldLabel}»", "exact_duplicate": "Точный дубликат (MD5 совпадает с другим файлом)", "semantic_duplicate": "Семантический дубликат «{title}»", "filename_mismatch": "Имя файла «{filename}» ≠ тег «{title}»", "loose_file": "Файл в корне библиотеки, вне структуры Artist/Album" },
+    "lint": { "whitespace": "«{fieldLabel}»: лишние пробелы в «{value}»", "artist_case": "Регистр исполнителя «{variant}» ≠ «{canonical}»", "album_case": "Регистр альбома «{variant}» ≠ «{canonical}»", "feat": "Фит в нестандартном виде: «{value}» (используйте «feat.»)", "duplicate_track_number": "«{value}»: повторяющийся номер трека в альбоме", "invalid_track_number": "«{value}»: некорректный номер трека", "invalid_disc_number": "«{value}»: некорректный номер диска", "album_artist_conflict": "Album Artist «{value}» противоречит другим трекам альбома", "genre_conflict": "Жанр «{value}» отличается от других треков альбома ({others})", "invalid_year": "Некорректный год «{value}»" },
+    "quality": { "change": "{fieldLabel}: «{old}» → «{new}»", "duplicate_field": "Поле «{fieldLabel}» выбрано для изменения повторно", "fix_move": "«{filename}» → «{target}»", "file_missing": "Файл не найден", "target_exists": "Целевой путь занят: {filename}", "write_tags_failed": "Не удалось записать теги", "target_occupied": "Целевой путь занят" }
+  },
+  "api": {
+    "errors": {
+      "empty_path": "Пустой путь", "file_not_found": "Файл не найден: {path}", "file_missing": "Файл не найден",
+      "expected_list": "{field} должен быть списком источников", "unknown_source": "Неизвестный источник: {source}", "invalid_setting": "Некорректное значение: {key}",
+      "invalid_transliteration": "Неверный режим транслитерации: {value}", "invalid_feedback": "Неверное действие фидбека: {value}", "invalid_search_source": "Неверный источник поиска: {value}",
+      "unknown_browser": "Неизвестный браузер: {browser} (доступны: {available})", "invalid_format": "Неверный формат: {value}", "invalid_source_format": "Неверный формат источника: {value}", "quality_out_of_range": "Качество вне диапазона (1..512)",
+      "invalid_video_id": "Некорректный video_id", "directory_not_found": "Каталог не найден: {path}", "not_directory": "Не каталог", "invalid_pick_kind": "kind должен быть folder или file", "invalid_authuser": "Неверный authuser", "browser_required": "Укажите браузер",
+      "oauth_credentials_required": "Укажите client_id и client_secret (приложение YouTube Data API)", "oauth_in_progress": "OAuth уже запущен: дождитесь завершения",
+      "artist_not_found": "Исполнитель не найден", "album_not_found": "Альбом не найден", "playlist_not_found": "Плейлист не найден", "no_tracks": "Нет треков", "empty_playlist": "Плейлист пуст", "url_required": "Нет URL", "empty_url_list": "Список URL пуст", "job_not_found": "Задача не найдена",
+      "library_directory_not_found": "Каталог библиотеки не найден", "fields_must_be_object": "fields — словарь", "write_tags_failed": "Не удалось записать теги", "check_fields": "Проверьте поля", "cover_format": "Поддерживаются JPEG и PNG", "invalid_cover": "Некорректный файл обложки", "empty_cover": "Файл обложки пуст", "read_tags_failed": "Не удалось прочитать теги", "cover_not_found": "Нет обложки", "move_failed": "Не удалось перенести (конфликт имени или нет тегов)", "invalid_dedup_mode": "Неверный режим дедупликации", "no_groups": "Нет групп", "no_files": "Нет файлов", "invalid_line_number": "Некорректный номер строки", "nothing_selected": "Ничего не выбрано", "ytm_connection_required": "Подключите YouTube Music (настройки → YouTube Music)", "artist_title_required": "Нужны artist и title"
+    },
+    "fields": {
+      "year_four_digits": "Год должен состоять из 4 цифр, например 2024",
+      "integer_required": "Должно быть целым числом"
+    }
+  }
+}
