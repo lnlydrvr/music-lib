@@ -39,6 +39,9 @@ Hierarchy is established through size, weight, line height, and case. Headings
 and technical labels are compact; body text remains large enough for extended
 reading. Tabular numerals are used where numbers need to align.
 
+Subtitles, hints, and other supporting text use muted color and smaller type
+without decorative prefixes such as `//`.
+
 ## Geometry and density
 
 - The base spacing unit is 4px; spacing levels are 4, 8, 12, 16, 24, and 32px.
@@ -77,6 +80,13 @@ Wide screens use top navigation and multi-column work areas. On mobile,
 navigation moves to a bottom bar with additional items in a separate menu; the
 background-task panel and player are accounted for when positioning bottom
 content. Resizing must not hide important actions or prevent list scrolling.
+
+## Interface language
+
+English and Russian are registered interface locales. English is the source and
+fallback catalog. User-facing application copy is localized; music metadata,
+paths, provider data, and technical identifiers remain unchanged. See
+[`I18N.md`](I18N.md) for authoring and validation rules.
 
 ## Maintaining this document
 

@@ -76,3 +76,6 @@ node_modules/
 .todos/
 .impeccable/
 .worktrees/
+.superpowers/
+docs/superpowers/
+anti-slop/
