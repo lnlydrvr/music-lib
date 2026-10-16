@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { ApiError, coverUrl, get, post } from "../src/lib/api";
+import { ApiError, coverUrl, get, post, request } from "../src/lib/api";
 
 function jsonResponse(body: unknown, status = 200) {
   return {
@@ -28,6 +28,33 @@ describe("api", () => {
     await get("/api/jobs", { limit: 10 });
     const url = String(fetchMock.mock.calls[0][0]);
     expect(url).toBe("/api/jobs?limit=10");
+  });
+
+  it.each([
+    [{ "X-Request-Source": "object" }, "object"],
+    [new Headers({ "X-Request-Source": "headers" }), "headers"],
+    [[["X-Request-Source", "tuples"]], "tuples"],
+  ] as const)("сохраняет %s заголовки и добавляет JSON Content-Type только при отсутствии", async (headers, source) => {
+    const fetchMock = vi.fn(async () => jsonResponse({ ok: true }));
+    vi.stubGlobal("fetch", fetchMock);
+
+    await request("POST", "/api/x", { source }, { headers });
+
+    const init = fetchMock.mock.calls[0][1] as RequestInit;
+    expect(init.headers).toBeInstanceOf(Headers);
+    const sentHeaders = init.headers as Headers;
+    expect(sentHeaders.get("X-Request-Source")).toBe(source);
+    expect(sentHeaders.get("Content-Type")).toBe("application/json");
+  });
+
+  it("не перезаписывает явно переданный JSON Content-Type", async () => {
+    const fetchMock = vi.fn(async () => jsonResponse({ ok: true }));
+    vi.stubGlobal("fetch", fetchMock);
+
+    await request("POST", "/api/x", { ok: true }, { headers: [["Content-Type", "application/merge-patch+json"]] });
+
+    expect((fetchMock.mock.calls[0][1] as RequestInit).headers).toBeInstanceOf(Headers);
+    expect(((fetchMock.mock.calls[0][1] as RequestInit).headers as Headers).get("Content-Type")).toBe("application/merge-patch+json");
   });
 
   it("сохраняет строковый detail как legacy renderable message и статус", async () => {

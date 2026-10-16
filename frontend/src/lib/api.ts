@@ -65,10 +65,11 @@ function buildUrl(path: string, params?: QueryParams): string {
   return path + (path.includes("?") ? "&" : "?") + s;
 }
 
-export async function request<T = unknown>(method: string, path: string, body?: unknown): Promise<T> {
-  const opts: RequestInit = { method, headers: {} };
+export async function request<T = unknown>(method: string, path: string, body?: unknown, init?: RequestInit): Promise<T> {
+  const headers = new Headers(init?.headers);
+  const opts: RequestInit = { ...init, method, headers };
   if (body !== undefined) {
-    (opts.headers as Record<string, string>)["Content-Type"] = "application/json";
+    if (!headers.has("Content-Type")) headers.set("Content-Type", "application/json");
     opts.body = JSON.stringify(body);
   }
   const res = await fetch(path, opts);
@@ -90,8 +91,8 @@ export async function request<T = unknown>(method: string, path: string, body?: 
   return (ct.includes("json") ? res.json() : res) as Promise<T>;
 }
 
-export function get<T = unknown>(path: string, params?: QueryParams, method = "GET"): Promise<T> {
-  return request<T>(method, buildUrl(path, params));
+export function get<T = unknown>(path: string, params?: QueryParams, method = "GET", init?: RequestInit): Promise<T> {
+  return request<T>(method, buildUrl(path, params), undefined, init);
 }
 
 export function post<T = unknown>(path: string, body?: unknown): Promise<T> {
