@@ -72,7 +72,7 @@ export function Topbar({ route, theme, onToggleTheme }: TopbarProps) {
     <header id="topbar">
       <div className="topbar-inner">
         <a className="brand" href="#/menu" {...prefetchHandlers("menu")}>
-          $ music-lib<span className="cursor"></span>
+          $ music-lib
         </a>
         <nav id="nav" aria-label={t("shell.nav.main_aria")}>
           {NAV_ITEMS.map((item) => (

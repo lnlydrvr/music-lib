@@ -403,7 +403,7 @@ describe("DiscoverScreen", () => {
     expect(screen.queryByRole("heading", { name: "Shazam" })).not.toBeInTheDocument();
 
     const tabs = screen.getAllByRole("tab");
-    expect(tabs.map((t) => t.textContent)).toEqual(["Поиск", "Shazam"]);
+    expect(tabs.map((t) => t.textContent)).toEqual(["Поиск", "Shazam", "Lucida"]);
     await user.click(screen.getByRole("tab", { name: "Shazam" }));
     expect(location.hash).toBe("#/discover/shazam");
     expect(await screen.findByRole("heading", { name: "Shazam" })).toBeInTheDocument();

@@ -16,6 +16,9 @@ dependencies = [
     "qrcode>=8.2",
     "fastembed>=0.7.0",
     "ytmusicapi>=1.12.3",
+    "httpx[http2]",
+    "playwright",
+    "pyjson5",
 ]
 
 [dependency-groups]

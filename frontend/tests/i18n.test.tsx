@@ -211,6 +211,16 @@ describe("i18n runtime", () => {
     expect(ru.ytm.empty).toBeDefined();
   });
 
+  it("resolves Lucida-specific readiness and failure keys in both locales", async () => {
+    await changeLanguage("en");
+    expect(i18n.t("lucida.chromium_required")).toBe("Chromium is required for Lucida.");
+    expect(i18n.t("api.errors.lucida_failed")).toBe("Lucida request failed.");
+
+    await changeLanguage("ru");
+    expect(i18n.t("lucida.chromium_required")).toBe("Для Lucida требуется Chromium.");
+    expect(i18n.t("api.errors.lucida_failed")).toBe("Запрос к Lucida не выполнен.");
+  });
+
   it("localizes the ProgressBar accessible name in Russian and English", async () => {
     render(<ProgressBar pct={25} />);
     const progress = await screen.findByRole("progressbar", { name: "Ход выполнения операции" });

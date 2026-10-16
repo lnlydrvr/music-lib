@@ -36,6 +36,27 @@ source; audio downloads are handled by `yt-dlp`. When the corresponding setting
 is enabled, a YouTube Music video is replaced with a matching Topic audio
 version when available.
 
+### Lucida downloads
+
+The Lucida tab supports searching and downloading individual tracks and albums
+from Qobuz and Amazon through Lucida. It does not support playlists. It is a
+private, local-use integration: users are responsible for ensuring that their
+use of third-party services and content is authorized. The app does not claim
+to grant rights to third-party services or content.
+
+Lucida access is prepared explicitly in a visible Playwright Chromium window.
+The launcher attempts to install Chromium when Playwright is available and the
+browser is missing; it can also be installed manually with
+`playwright install chromium`. Setup requires a local graphical desktop session.
+The status check reports
+whether Playwright and Chromium are available without launching a browser. If
+access is missing or expires, search and download fail immediately and direct
+the user to prepare access; they never launch a browser implicitly. Completed
+downloads are written to the library `Inbox` before placement is attempted. A
+skipped or failed placement leaves the completed file in `Inbox` for recovery.
+The selected service, optional storefront country, and bounded download
+concurrency are configurable in Settings.
+
 ### Metadata preparation
 
 Metadata can be fetched from iTunes, Deezer, and Discogs. Users choose which
@@ -46,7 +67,9 @@ lyrics, and can apply operations to multiple tracks at once.
 
 The library directory is configured in settings or with `MUSIC_LIB_DIR`. Files
 can be organized by artist and album, sorted, searched, and merged into albums.
-Playlists are stored as M3U8 archives.
+Playlists are stored as M3U8 archives. Shazam import reads a text file of
+`Title — Artist` entries; by default the file is stored in the library's hidden
+`.system` directory, or users can select a custom file in Settings.
 
 ### Quality checks
 
@@ -90,6 +113,10 @@ searches for matches and lets users continue to download a selected track.
   changes to the third-party service or the `ytmusicapi` library.
 - Search, downloads, metadata, and lyrics depend on external services and
   network access.
+- Lucida currently supports Qobuz and Amazon tracks and albums only, not
+  playlists. It depends on Lucida, a valid prepared access clearance, and a
+  locally usable Playwright Chromium browser; any of these may become
+  unavailable or change without notice.
 - Visual themes and language choices may evolve. Current interface guidelines
   are in [`DESIGN.md`](DESIGN.md); implementation details are in the source
   code.

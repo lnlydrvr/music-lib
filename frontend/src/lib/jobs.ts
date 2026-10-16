@@ -8,6 +8,8 @@ export interface JobProgress {
   percent?: number | null;
   message?: RenderableMessage;
   msg?: RenderableMessage;
+  done?: number;
+  total?: number;
 }
 
 /** Terminal job failures retain their server descriptor for history rendering. */

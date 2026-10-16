@@ -9,7 +9,9 @@ from __future__ import annotations
 import base64
 import hashlib
 import json
+import math
 import os
+import re
 import shutil
 import ssl
 import tempfile
@@ -20,6 +22,7 @@ import xml.etree.ElementTree as ET
 from pathlib import Path
 from types import SimpleNamespace
 from typing import Any
+from urllib.parse import urlsplit
 
 from fastapi import APIRouter, HTTPException, Query, Request
 from fastapi.responses import JSONResponse, Response, StreamingResponse
@@ -31,9 +34,10 @@ from ..config import (
     FEEDBACK_ACTION_KEY, get_feedback_action, get_metadata_sources,
     get_metadata_sources_order,
     get_name_translit, get_primuse_sidecar, get_saved_language,
-    get_search_source, get_shazam_file, get_source_format, get_youtube_browser,
+    get_lucida_country, get_lucida_jobs, get_lucida_service, get_search_source, get_shazam_file,
+    get_source_format, get_youtube_browser,
     get_youtube_cookies_file, get_ytmusic_no_clips,
-    inbox_dir, resolve_shazam_file,
+    inbox_dir, parse_lucida_jobs, resolve_shazam_file,
     load_config, save_config, update_config, METADATA_SOURCES_KEY,
     METADATA_SOURCES_ORDER_KEY, NAME_TRANSLITS,
     NAME_TRANSLIT_KEY, PRIMUSE_SIDECAR_KEY,
@@ -42,6 +46,7 @@ from ..config import (
     SOURCE_FORMAT_KEY,
     SOURCE_FORMATS, YOUTUBE_BROWSER_KEY, YOUTUBE_BROWSERS, YOUTUBE_COOKIES_FILE_KEY,
     YTMUSIC_AUTH_FILE_KEY, YTMUSIC_NO_CLIPS_KEY,
+    LUCIDA_COUNTRY_KEY, LUCIDA_JOBS_KEY, LUCIDA_SERVICE_KEY, LUCIDA_SERVICES,
 )
 from ..downloader import (
     Downloader, append_m3u8, archive_path, AudioFormat,
@@ -60,6 +65,8 @@ from ..shazam_import import (
 from ..tagger import apply_cover_from_url, get_tags, set_tags, AudioTags
 from ..utils import clean_artist_name, logger, sanitize_name
 from .. import services
+from .. import lucida
+from ..lucida.cf import ClearanceAccessError
 from .jobs import JobFailure, jobs
 from .messages import message
 from .serialize import (
@@ -93,10 +100,8 @@ def _num_sort_key(value: str | None) -> tuple[int, int, str]:
     Числовые значения сортируются по числу (не лексикографически, где "10"
     вставало раньше "2"); пустые/нечисловые уходят в конец.
     """
-    import re as _re
-
     text = (value or "").strip()
-    match = _re.search(r"\d+", text)
+    match = re.search(r"\d+", text)
     if not match:
         return (1, 0, text.lower())
     return (0, int(match.group(0)), text.lower())
@@ -109,6 +114,120 @@ def _path_or_400(value: str) -> Path:
             detail=message("api.errors.empty_path", fallback="Empty path"),
         )
     return Path(value)
+
+
+def _lucida_error(status_code: int, code: str, fallback: str) -> HTTPException:
+    """Create a structured Lucida failure without exposing provider details."""
+    return HTTPException(status_code=status_code, detail=message(code, fallback=fallback))
+
+
+def _lucida_service_or_400(value: Any) -> str:
+    """Validate an explicitly supplied Lucida service at the API boundary."""
+    service = value.strip().lower() if isinstance(value, str) else ""
+    if service not in LUCIDA_SERVICES:
+        raise HTTPException(
+            status_code=400,
+            detail=message("api.errors.invalid_setting", {"key": LUCIDA_SERVICE_KEY}, fallback="Invalid value: lucida_service"),
+        )
+    return service
+
+
+def _lucida_jobs_or_400(value: Any) -> int:
+    """Validate a Lucida worker count as a bounded integer or integer string."""
+    jobs_count = parse_lucida_jobs(value)
+    if jobs_count is None:
+        raise HTTPException(
+            status_code=400,
+            detail=message("api.errors.invalid_setting", {"key": LUCIDA_JOBS_KEY}, fallback="Invalid value: lucida_jobs"),
+        )
+    return jobs_count
+
+
+def _lucida_url_or_400(value: Any) -> str:
+    """Validate and normalize a provider URL before creating a background job."""
+    url = value.strip() if isinstance(value, str) else ""
+    try:
+        parsed = urlsplit(url)
+    except ValueError:
+        parsed = None
+    allowed_hosts = {
+        "qobuz.com", "www.qobuz.com", "open.qobuz.com",
+        "amazon.com", "music.amazon.com", "music.amazon.co.uk", "music.amazon.co.jp",
+    }
+    if (
+        not url or parsed is None or parsed.scheme not in {"http", "https"}
+        or not parsed.hostname
+        or parsed.hostname.lower().strip(".") not in allowed_hosts
+    ):
+        raise HTTPException(
+            status_code=400,
+            detail=message("api.errors.url_required", fallback="URL is required"),
+        )
+    return url
+
+
+def _lucida_progress(job, event: dict[str, Any]) -> None:
+    """Adapt only typed Task 5 events; never retain provider-provided text."""
+    event_type = event.get("type") if isinstance(event, dict) else None
+    if event_type == "bytes":
+        amount = event.get("bytes")
+        if isinstance(amount, int) and not isinstance(amount, bool) and amount >= 0:
+            job.push(message("jobs.lucida.bytes", {"bytes": amount}, fallback=f"Downloaded {amount} bytes"))
+        return
+    if event_type == "item":
+        status = event.get("status")
+        codes = {
+            "ok": ("jobs.lucida.item_complete", "Lucida item downloaded"),
+            "skip": ("jobs.lucida.item_skipped", "Lucida item kept in Inbox"),
+            "fail": ("jobs.lucida.item_failed", "Lucida item failed"),
+        }
+        if status in codes:
+            code, fallback = codes[status]
+            job.push(message(code, fallback=fallback), done=event.get("done"), total=event.get("total"), percent=event.get("percent"))
+        return
+    if event_type == "status":
+        job.push(message("jobs.lucida.status_working", fallback="Lucida is working…"))
+
+
+def _lucida_result(result: Any) -> Any:
+    """Build the fixed public result schema without copying provider fields."""
+    if not isinstance(result, dict):
+        return {"items": [], "error": message("api.errors.lucida_failed", fallback="Lucida download failed.")}
+    cleaned: dict[str, Any] = {"items": []}
+    if result.get("error") or result.get("message"):
+        logger.warning("Lucida download result failed [lucida_result_failed]")
+        cleaned["error"] = message("api.errors.lucida_failed", fallback="Lucida download failed.")
+    items = result.get("items")
+    if not isinstance(items, list):
+        return cleaned
+    for item in items:
+        if not isinstance(item, dict):
+            continue
+        safe_item = {
+            key: item[key]
+            for key in ("url", "title", "status")
+            if isinstance(item.get(key), str)
+        }
+        if "status" in safe_item and safe_item["status"] not in {"ok", "skip", "fail", "published_source_retained"}:
+            safe_item["status"] = "fail"
+        if item.get("error") or item.get("message"):
+            logger.warning("Lucida download item failed [lucida_item_failed]")
+            safe_item["status"] = "fail"
+            safe_item["error"] = message("api.errors.lucida_failed", fallback="Lucida download failed.")
+        cleaned["items"].append(safe_item)
+    return cleaned
+
+
+def _lucida_search_results(value: Any) -> list[dict[str, str]]:
+    """Expose only public string metadata from untrusted Lucida search items."""
+    if not isinstance(value, list):
+        return []
+    return [
+        {key: item[key] for key in ("url", "title", "artist", "album", "cover_url")
+         if isinstance(item.get(key), str) and (key != "cover_url" or item[key].startswith("https://"))}
+        for item in value
+        if isinstance(item, dict)
+    ]
 
 
 def _get_file(value: str) -> Path:
@@ -286,6 +405,9 @@ def api_get_settings():
         "ytmusic_connected": ytm_mod.connected(),
         "ytmusic_no_clips": get_ytmusic_no_clips(),
         "ytm_feedback_action": get_feedback_action(),
+        LUCIDA_SERVICE_KEY: get_lucida_service(),
+        LUCIDA_COUNTRY_KEY: get_lucida_country() or "",
+        LUCIDA_JOBS_KEY: get_lucida_jobs(),
         "search_source": get_search_source(),
         "name_translit": get_name_translit(),
         "metadata_sources": get_metadata_sources(),
@@ -317,6 +439,26 @@ def api_put_settings(payload: dict):
                     raise HTTPException(status_code=400, detail=message("api.errors.invalid_setting", {"key": key}, fallback=f"Invalid value: {key}"))
                 cfg[key] = value
                 known.add(key)
+        if LUCIDA_SERVICE_KEY in payload:
+            cfg[LUCIDA_SERVICE_KEY] = _lucida_service_or_400(payload[LUCIDA_SERVICE_KEY])
+            known.add(LUCIDA_SERVICE_KEY)
+        if LUCIDA_COUNTRY_KEY in payload:
+            raw_country = payload[LUCIDA_COUNTRY_KEY]
+            if not isinstance(raw_country, str):
+                raise HTTPException(status_code=400, detail=message("api.errors.invalid_setting", {"key": LUCIDA_COUNTRY_KEY}, fallback="Invalid value: lucida_country"))
+            if not raw_country.isascii():
+                raise HTTPException(status_code=400, detail=message("api.errors.invalid_setting", {"key": LUCIDA_COUNTRY_KEY}, fallback="Invalid value: lucida_country"))
+            country = raw_country.strip().upper()
+            if country and not re.fullmatch(r"[A-Z]{2}", country):
+                raise HTTPException(status_code=400, detail=message("api.errors.invalid_setting", {"key": LUCIDA_COUNTRY_KEY}, fallback="Invalid value: lucida_country"))
+            if country:
+                cfg[LUCIDA_COUNTRY_KEY] = country
+            else:
+                cfg.pop(LUCIDA_COUNTRY_KEY, None)
+            known.add(LUCIDA_COUNTRY_KEY)
+        if LUCIDA_JOBS_KEY in payload:
+            cfg[LUCIDA_JOBS_KEY] = _lucida_jobs_or_400(payload[LUCIDA_JOBS_KEY])
+            known.add(LUCIDA_JOBS_KEY)
         for key in (PRIMUSE_SIDECAR_KEY, YTMUSIC_NO_CLIPS_KEY):
             if key in payload:
                 raw = payload[key]
@@ -374,6 +516,141 @@ def api_put_settings(payload: dict):
     if migrated_shazam:
         result["migrated_shazam"] = migrated_shazam
     return result
+
+
+# --- Lucida -----------------------------------------------------------------
+
+
+@search_rt.get("/lucida/status")
+def api_lucida_status(service: str | None = None):
+    """Return local Lucida readiness; this endpoint never opens a browser."""
+    selected_service = _lucida_service_or_400(service) if service is not None else get_lucida_service()
+    try:
+        return lucida.status(selected_service)
+    except (ImportError, ModuleNotFoundError):
+        raise _lucida_error(503, "api.errors.lucida_unavailable", "Lucida is unavailable on this installation.")
+    except Exception:
+        raise _lucida_error(502, "api.errors.lucida_failed", "Lucida status check failed.")
+
+
+@search_rt.post("/lucida/setup")
+def api_lucida_setup():
+    """Start the explicit, visible browser flow that obtains Cloudflare access."""
+    def run(_job):
+        from ..lucida import cf
+
+        try:
+            cf.acquire(visible=True)
+        except ClearanceAccessError:
+            raise JobFailure(message("api.errors.lucida_access_required", fallback="Lucida access is required. Complete setup first."))
+        except (ImportError, ModuleNotFoundError):
+            raise JobFailure(message("api.errors.lucida_unavailable", fallback="Lucida is unavailable on this installation."))
+        except Exception:
+            raise JobFailure(message("api.errors.lucida_failed", fallback="Lucida setup failed."))
+        return {"access_ready": True}
+
+    job = jobs.submit(message("jobs.lucida.setup_name", fallback="Lucida — set up access"), run)
+    return {"job_id": job.id, "name": job.name}
+
+
+@search_rt.get("/lucida/search")
+def api_lucida_search(q: str = "", service: str | None = None):
+    query = q.strip()
+    if not query:
+        raise HTTPException(status_code=400, detail=message("api.errors.lucida_query_required", fallback="Lucida search query is required."))
+    selected_service = _lucida_service_or_400(service) if service is not None else get_lucida_service()
+    country = get_lucida_country()
+    try:
+        result = lucida.search(query, selected_service, **({"country": country} if country else {}))
+    except (ClearanceAccessError, lucida.LucidaAccessRequired):
+        raise _lucida_error(403, "api.errors.lucida_access_required", "Lucida access is required. Complete setup first.")
+    except (ImportError, ModuleNotFoundError):
+        raise _lucida_error(503, "api.errors.lucida_unavailable", "Lucida is unavailable on this installation.")
+    except Exception:
+        raise _lucida_error(502, "api.errors.lucida_failed", "Lucida search failed.")
+    if not isinstance(result, dict):
+        result = {}
+    return {
+        "albums": _lucida_search_results(result.get("albums", [])),
+        "tracks": _lucida_search_results(result.get("tracks", [])),
+    }
+
+
+@search_rt.get("/lucida/release")
+def api_lucida_release(url: str, service: str | None = None):
+    url = _lucida_url_or_400(url)
+    selected_service = _lucida_service_or_400(service) if service is not None else get_lucida_service()
+    country = get_lucida_country()
+    try:
+        result = lucida.release_preview(url, selected_service, **({"country": country} if country else {}))
+    except (ClearanceAccessError, lucida.LucidaAccessRequired):
+        raise _lucida_error(403, "api.errors.lucida_access_required", "Lucida access is required. Complete setup first.")
+    except (ImportError, ModuleNotFoundError):
+        raise _lucida_error(503, "api.errors.lucida_unavailable", "Lucida is unavailable on this installation.")
+    except Exception:
+        raise _lucida_error(502, "api.errors.lucida_failed", "Lucida release preview failed.")
+    if not isinstance(result, dict):
+        raise _lucida_error(502, "api.errors.lucida_failed", "Lucida release preview failed.")
+    tracks = result.get("tracks") if isinstance(result.get("tracks"), list) else []
+    clean_tracks = []
+    for item in tracks:
+        if not isinstance(item, dict):
+            continue
+        ordinal = len(clean_tracks) + 1
+        number = item.get("number")
+        if isinstance(number, bool):
+            number = ordinal
+        elif isinstance(number, int):
+            number = number if 0 <= number <= 2**53 - 1 else ordinal
+        elif isinstance(number, float):
+            number = int(number) if math.isfinite(number) and number.is_integer() and 0 <= number <= 2**53 - 1 else ordinal
+        elif isinstance(number, str) and re.fullmatch(r"\d+", number.strip()):
+            parsed_number = int(number.strip())
+            number = parsed_number if parsed_number <= 2**53 - 1 else ordinal
+        else:
+            number = ordinal
+        track = {"number": number, "title": item.get("title") if isinstance(item.get("title"), str) else ""}
+        duration = item.get("duration")
+        if isinstance(duration, (int, float)) and not isinstance(duration, bool) and duration >= 0 and math.isfinite(duration):
+            track["duration"] = duration
+        clean_tracks.append(track)
+    payload = {"title": result.get("title") if isinstance(result.get("title"), str) else "",
+               "artist": result.get("artist") if isinstance(result.get("artist"), str) else "",
+               "tracks": clean_tracks, "track_count": len(clean_tracks)}
+    cover = result.get("cover_url")
+    if isinstance(cover, str) and cover.startswith("https://"):
+        payload["cover_url"] = cover
+    return payload
+
+
+@search_rt.post("/lucida/download")
+def api_lucida_download(payload: dict):
+    raw_kind = payload.get("kind")
+    url = _lucida_url_or_400(payload.get("url"))
+    kind = raw_kind.strip().lower() if isinstance(raw_kind, str) else ""
+    service = _lucida_service_or_400(payload["service"]) if "service" in payload else get_lucida_service()
+    jobs_count = _lucida_jobs_or_400(payload["jobs"]) if "jobs" in payload else get_lucida_jobs()
+    country = get_lucida_country()
+    if kind not in {"album", "track"}:
+        raise HTTPException(status_code=400, detail=message("api.errors.lucida_invalid_kind", fallback="Lucida kind must be album or track."))
+
+    def run(job):
+        try:
+            result = lucida.download(
+                url, kind, service, jobs=jobs_count,
+                **({"country": country} if country else {}),
+                progress=lambda event: _lucida_progress(job, event),
+            )
+            return _lucida_result(result)
+        except (ClearanceAccessError, lucida.LucidaAccessRequired):
+            raise JobFailure(message("api.errors.lucida_access_required", fallback="Lucida access is required. Complete setup first."))
+        except (ImportError, ModuleNotFoundError):
+            raise JobFailure(message("api.errors.lucida_unavailable", fallback="Lucida is unavailable on this installation."))
+        except Exception:
+            raise JobFailure(message("api.errors.lucida_failed", fallback="Lucida download failed."))
+
+    job = jobs.submit(message("jobs.lucida.download_name", fallback="Lucida — download"), run)
+    return {"job_id": job.id, "name": job.name}
 
 
 #: Куда кладём загруженный cookies.txt (локально, рядом с конфигом).

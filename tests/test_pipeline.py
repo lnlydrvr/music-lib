@@ -1,12 +1,14 @@
 """Tests for src/pipeline.py — лирикс + перенос файла из Inbox в библиотеку."""
 from __future__ import annotations
 
+import os
 from pathlib import Path
 
 import pytest
 
 from src.pipeline import (
     apply_metadata_from_sources, fetch_and_apply_lyrics, move_to_library,
+    move_to_library_result,
 )
 from src.tagger import set_tags, get_tags, AudioTags
 
@@ -174,6 +176,87 @@ class TestMoveToLibrary:
         _stub(out / "Artist" / "Song.mp3")
         assert move_to_library(p, out) is None
         assert p.exists()
+
+    def test_result_api_distinguishes_target_conflict(self, tmp_path):
+        out = tmp_path
+        p = _stub(out / "Inbox" / "Old.mp3",
+                  AudioTags(title="Song", artist="Artist"))
+        _stub(out / "Artist" / "Song.mp3")
+
+        result = move_to_library_result(p, out)
+
+        assert result.status == "conflict"
+        assert result.path is None
+        assert result.error == ""
+        assert p.exists()
+
+    def test_result_api_keeps_concurrent_target_creation_as_conflict(
+            self, tmp_path, monkeypatch):
+        """A target created after the precheck must never be overwritten."""
+        out = tmp_path
+        p = _stub(out / "Inbox" / "Old.mp3",
+                  AudioTags(title="Song", artist="Artist"))
+        target = out / "Artist" / "Song.mp3"
+        real_link = os.link
+
+        def create_competing_target(source, destination, *args, **kwargs):
+            Path(destination).write_bytes(b"concurrent file")
+            return real_link(source, destination, *args, **kwargs)
+
+        monkeypatch.setattr("src.pipeline.os.link", create_competing_target)
+
+        result = move_to_library_result(p, out)
+
+        assert result.status == "conflict"
+        assert result.path is None
+        assert result.error == ""
+        assert p.exists()
+        assert target.read_bytes() == b"concurrent file"
+
+    def test_result_api_distinguishes_publication_failure(self, tmp_path, monkeypatch):
+        out = tmp_path
+        p = _stub(out / "Inbox" / "Old.mp3",
+                  AudioTags(title="Song", artist="Artist"))
+
+        def fail_link(source, target):
+            raise OSError("disk full")
+
+        monkeypatch.setattr("src.pipeline.os.link", fail_link)
+
+        result = move_to_library_result(p, out)
+
+        assert result.status == "failed"
+        assert result.path is None
+        assert result.error == "disk full"
+        assert p.exists()
+
+    def test_result_api_keeps_published_link_when_source_unlink_fails(
+            self, tmp_path, monkeypatch):
+        out = tmp_path
+        p = _stub(out / "Inbox" / "Old.mp3",
+                  AudioTags(title="Song", artist="Artist"))
+        original_contents = p.read_bytes()
+        target = out / "Artist" / "Song.mp3"
+        real_unlink = Path.unlink
+
+        def fail_source_unlink(self, *args, **kwargs):
+            if self == p:
+                raise OSError("source is busy")
+            if self == target:
+                pytest.fail("published target must not be removed")
+            return real_unlink(self, *args, **kwargs)
+
+        monkeypatch.setattr(Path, "unlink", fail_source_unlink)
+
+        result = move_to_library_result(p, out)
+
+        assert result.status == "published_source_retained"
+        assert result.path == target
+        assert result.error == "published_source_retained"
+        assert p.exists()
+        assert target.exists()
+        assert target.read_bytes() == original_contents
+        assert os.path.samestat(p.stat(), target.stat())
 
     def test_reuses_existing_artist_dir_translit(self, tmp_path):
         out = tmp_path

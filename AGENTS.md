@@ -24,6 +24,7 @@
 python3 -m venv .venv
 source .venv/bin/activate
 python -m pip install -e .
+playwright install chromium  # optional; the launcher attempts this for Lucida
 python scripts/run.py
 ```
 
@@ -36,8 +37,11 @@ npm run dev
 ```
 
 The `python scripts/run.py` launcher installs frontend dependencies and builds
-the UI when needed. Running `python app.py` directly requires the
-`src/web/dist` directory to have been built in advance.
+the UI when needed. It also attempts to install Playwright Chromium if the
+Python package is available and the browser is missing; failure to install it
+does not prevent app startup. Lucida access preparation requires a visible
+browser and a local graphical session. Running `python app.py` directly requires
+the `src/web/dist` directory to have been built in advance.
 
 ### Checks
 
@@ -72,7 +76,7 @@ cd frontend && npm run check:i18n-keys
 ## Architecture
 
 - `src/` — Python logic for downloads, search, metadata, tags, configuration,
-  and recommendations.
+  recommendations, and the Lucida adapter in `src/lucida/`.
 - `src/web/` — FastAPI routes, API serialization, and background jobs.
 - `frontend/src/` — React and TypeScript UI; Vite builds it into `src/web/dist`.
 - `scripts/run.py` — app launcher; `scripts/dev.py` — development startup for
@@ -91,6 +95,7 @@ cd frontend && npm run check:i18n-keys
 | `pipeline.py`, `services.py` | Operation pipelines and library services. |
 | `health.py`, `lint.py`, `normalize.py`, `quality.py` | Library diagnostics and building/applying fix plans. |
 | `ytmusic.py`, `recommend.py`, `shazam_import.py` | YouTube Music integration, recommendations, and Shazam list import. |
+| `lucida/` | Lucida service adapters, access preparation, search, download, and library ingestion. |
 | `web/routes.py`, `web/jobs.py`, `web/serialize.py` | API routes, background jobs, and response serialization. |
 
 For implementation details, consult the relevant source and tests. This table
@@ -104,6 +109,9 @@ intentionally does not duplicate module APIs.
 - The library directory is resolved in this order: `MUSIC_LIB_DIR`, the legacy
   `MUSIC_DL_DIR`, `~/.config/music-lib/config.json`, then an available iCloud
   folder or `~/Music`.
+- The launcher may attempt a Playwright Chromium installation for Lucida; this
+  is optional for the rest of the application. The user must explicitly prepare
+  Lucida access in the visible browser.
 - Do not add secrets or user data to the repository. Configuration, cookies,
   and YouTube Music authorization must remain in user directories.
 - Bulk library changes must provide a reviewable plan before they are applied.

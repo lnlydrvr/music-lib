@@ -11,6 +11,8 @@
 """
 from __future__ import annotations
 
+from dataclasses import dataclass
+import os
 from pathlib import Path
 
 from .lyrics import fetch_lyrics
@@ -183,13 +185,23 @@ def _library_path(filepath: Path, output_dir: Path) -> Path:
     return target_dir / f"{sanitize_name(title)}{filepath.suffix}"
 
 
-def move_to_library(filepath: Path, output_dir: Path) -> Path | None:
+@dataclass(frozen=True)
+class MoveToLibraryResult:
+    """Typed outcome of moving an Inbox file into the library."""
+
+    status: str
+    path: Path | None = None
+    error: str = ""
+
+
+def move_to_library_result(filepath: Path, output_dir: Path) -> MoveToLibraryResult:
     """Переместить файл из Inbox в библиотеку по текущим тегам.
 
     Sidecar Primuse (.lrc + -cover.jpg) переносятся вместе с треком.
 
     Returns:
-        Новый путь, если файл перемещён; None при ошибке.
+        ``moved`` with the target path, ``conflict`` when the target exists, or
+        ``failed`` with the filesystem error. The source is retained on failure.
     """
     try:
         old_tags = get_tags(filepath)
@@ -204,21 +216,37 @@ def move_to_library(filepath: Path, output_dir: Path) -> Path | None:
             maybe_write_sidecars(filepath)
         except Exception:
             pass
-        return filepath
+        return MoveToLibraryResult("moved", filepath)
     if target.exists():
-        return None
+        return MoveToLibraryResult("conflict")
     try:
         target.parent.mkdir(parents=True, exist_ok=True)
-        filepath.rename(target)
-    except OSError:
-        return None
+        os.link(filepath, target)
+    except FileExistsError:
+        return MoveToLibraryResult("conflict")
+    except OSError as exc:
+        return MoveToLibraryResult("failed", error=str(exc))
+    try:
+        filepath.unlink()
+    except OSError as exc:
+        return MoveToLibraryResult(
+            "published_source_retained",
+            target,
+            error="published_source_retained",
+        )
     try:
         from .primuse import sync_after_move
 
         sync_after_move(filepath, target, old_title=old_title)
     except Exception:
         pass
-    return target
+    return MoveToLibraryResult("moved", target)
+
+
+def move_to_library(filepath: Path, output_dir: Path) -> Path | None:
+    """Compatibility wrapper preserving the legacy path-or-None contract."""
+    result = move_to_library_result(filepath, output_dir)
+    return result.path if result.status == "moved" else None
 
 
 def _nfc(s) -> str:

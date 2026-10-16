@@ -32,6 +32,7 @@ interface SettingsData {
   youtube_cookies_set: boolean;
   ytmusic_no_clips: boolean;
   ytm_feedback_action: string;
+  lucida_service?: "qobuz" | "amazon";
   search_source: string;
   name_translit: string;
   metadata_sources: string[];
@@ -133,6 +134,7 @@ export default function SettingsScreen() {
         primuse_sidecar: form.primuse_sidecar,
         name_translit: form.name_translit,
         ytm_feedback_action: form.ytm_feedback_action,
+        lucida_service: form.lucida_service || "qobuz",
         search_source: form.search_source,
         youtube_browser: form.youtube_browser,
         ytmusic_no_clips: form.ytmusic_no_clips,
@@ -308,6 +310,14 @@ export default function SettingsScreen() {
               onCookiesDeleted: () => setS((cur) => (cur ? { ...cur, youtube_cookies_set: false } : cur)),
             }}
           />
+          <Card title={t("settings.lucida.title")} sub={t("settings.lucida.subtitle")}>
+            <Field label={t("settings.lucida.service")}>
+              <select value={form.lucida_service || "qobuz"} onChange={(event) => patch({ lucida_service: event.target.value as NonNullable<SettingsData["lucida_service"]> })}>
+                <option value="qobuz">{t("settings.lucida.qobuz")}</option>
+                <option value="amazon">{t("settings.lucida.amazon")}</option>
+              </select>
+            </Field>
+          </Card>
         </div>
 
         <div className="set-col">

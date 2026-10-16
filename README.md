@@ -21,6 +21,8 @@ one in Settings.
 ## Features
 
 - Search for and download audio from YouTube and YouTube Music.
+- Search and download individual Qobuz and Amazon tracks or albums through
+  Lucida.
 - Fetch metadata and cover art from iTunes, Deezer, and Discogs.
 - Edit tags and cover art; find and update lyrics.
 - Browse your library by albums, artists, tracks, and playlists.
@@ -28,13 +30,15 @@ one in Settings.
   apply suggested fixes.
 - Import Shazam lists in `Title — Artist` format.
 - Get YouTube Music recommendations based on your local library.
-- Configure audio format and quality, metadata sources, and download behavior.
+- Configure audio format and quality, metadata sources, search source, Lucida
+  service and download concurrency, and other download behavior.
 
 ## Requirements
 
 - Python 3.10 or later.
 - Node.js with npm: version 20.19+ in the 20.x line, 22.12+ in the 22.x line,
   or 24+. The launcher uses Node.js to install dependencies and build the UI.
+- `ffmpeg` is needed for audio conversion and compression features.
 - Network access for search, downloads, and external services.
 
 Python dependencies are defined in `pyproject.toml`. Frontend dependencies are
@@ -52,8 +56,14 @@ source .venv/bin/activate
 python -m pip install -e .
 ```
 
-If you use `uv`, you can also run `uv pip install -e .` in an active virtual
-environment.
+If you use `uv` and want to install the versions recorded in `uv.lock`, run
+`uv sync --locked` from the repository root. This creates or updates the
+project's `.venv` and includes the default `dev` dependency group. The
+`uv pip install -e .` command is also supported in an active virtual
+environment, but it reads dependencies from `pyproject.toml` and does not
+consume `uv.lock`. The standard launcher installs Chromium for Lucida when
+Playwright is available and Chromium is missing. To install it manually, run
+`playwright install chromium`.
 
 On Windows, activate the environment with `.venv\Scripts\activate`.
 
@@ -99,6 +109,24 @@ python app.py
 
 The `music-lib` command is also available after installing with `pip install -e .`.
 
+### Lucida access setup
+
+Lucida access is prepared explicitly in a visible Chromium window. From the
+Lucida tab, choose **Prepare access** and complete the access challenge. This
+requires a local graphical desktop session. Search and download do not launch a
+browser implicitly; if access expires, prepare it again. The status check does
+not launch a browser.
+
+If Chromium was not installed by the launcher, install it with:
+
+```bash
+playwright install chromium
+```
+
+Lucida supports individual tracks and albums from the selected Qobuz or Amazon
+service, not playlists. Completed files are first saved to `Inbox`; if moving a
+file into the library is skipped or fails, it remains there.
+
 ## Music library directory
 
 Choose the library directory in the app settings or set it with the
@@ -119,17 +147,19 @@ Music/
 ```
 
 Playlist M3U8 archives are stored in the `Playlists` directory inside the
-library.
+library. Shazam import defaults to a text file under the hidden `.system`
+directory in the library; a custom file can be selected in Settings.
 
 ## YouTube Music
 
 YouTube Music integration requires authorization. Configure it in Settings;
-the app supports the OAuth device flow and browser-header authentication. The
-default authorization file is stored at
-`~/.config/music-lib/ytmusic_auth.json`.
+the app supports OAuth device flow and browser-header authentication. The default
+authorization file is `~/.config/music-lib/ytmusic_auth.json`. The main search
+source can be changed between YouTube Music and YouTube in Settings.
 
 Feature availability depends on the connected account and the external API.
-On macOS, extracting browser cookies may prompt for Keychain access.
+On macOS, extracting browser cookies may prompt for Keychain access. YouTube
+downloads may also require valid cookies, configurable in Settings.
 
 ## Tests and checks
 
@@ -156,3 +186,7 @@ npm run build
 
 The repository does not currently include a `LICENSE` file, so the terms for
 use and distribution have not been defined.
+
+## Acknowledgments
+
+Thanks to [init.Made](https://initmade.com) for the UI inspiration.

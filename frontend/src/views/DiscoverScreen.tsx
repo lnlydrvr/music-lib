@@ -6,8 +6,9 @@ import clsx from "clsx";
 import { useTranslation } from "react-i18next";
 import SearchScreen from "./SearchScreen";
 import MiscScreen from "./MiscScreen";
+import LucidaScreen from "./LucidaScreen";
 
-const TABS = ["search", "shazam"] as const;
+const TABS = ["search", "shazam", "lucida"] as const;
 
 type TabId = (typeof TABS)[number];
 
@@ -58,7 +59,7 @@ export default function DiscoverScreen() {
       <div className="tab-panel">
         {mounted.map((id) => (
           <div key={id} className="tab-pane" style={{ display: id === tab ? "" : "none" }}>
-            {id === "search" ? <SearchScreen /> : <MiscScreen />}
+            {id === "search" ? <SearchScreen /> : id === "shazam" ? <MiscScreen /> : <LucidaScreen />}
           </div>
         ))}
       </div>

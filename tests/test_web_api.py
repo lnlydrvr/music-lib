@@ -6,6 +6,7 @@
 from __future__ import annotations
 
 import time
+import math
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
@@ -62,6 +63,636 @@ def wait_job(client: TestClient, job_id: str, timeout: float = 5.0) -> dict:
             return st
         time.sleep(0.05)
     raise AssertionError(f"Задача не завершилась: {job_id}")
+
+
+# --- Lucida -----------------------------------------------------------------
+
+
+def test_lucida_status_returns_adapter_readiness(client, monkeypatch):
+    import src.lucida.cf as cf
+
+    monkeypatch.setattr(cf, "acquire", lambda **_kwargs: pytest.fail("status must not acquire access"))
+    monkeypatch.setattr(routes.lucida, "status", lambda service="qobuz": {
+        "available": True,
+        "access_ready": False,
+        "chromium_ready": True,
+        "service": service,
+    })
+
+    response = client.get("/api/lucida/status", params={"service": "amazon"})
+
+    assert response.status_code == 200
+    assert response.json() == {
+        "available": True,
+        "access_ready": False,
+        "chromium_ready": True,
+        "service": "amazon",
+    }
+
+
+def test_lucida_status_uses_configured_service_when_query_is_omitted(client, monkeypatch):
+    import src.config as config
+
+    config.save_config({config.LUCIDA_SERVICE_KEY: "amazon"})
+    monkeypatch.setattr(routes.lucida, "status", lambda service="qobuz": {
+        "available": True,
+        "access_ready": False,
+        "chromium_ready": True,
+        "service": service,
+    })
+
+    response = client.get("/api/lucida/status")
+
+    assert response.status_code == 200
+    assert response.json()["service"] == "amazon"
+
+
+def test_lucida_routes_reject_explicit_invalid_service(client, monkeypatch):
+    import src.config as config
+
+    config.save_config({config.LUCIDA_SERVICE_KEY: "amazon"})
+    monkeypatch.setattr(routes.lucida, "status", lambda *_args: pytest.fail("invalid service must not reach adapter"))
+    monkeypatch.setattr(routes.lucida, "search", lambda *_args: pytest.fail("invalid service must not reach adapter"))
+    monkeypatch.setattr(routes.lucida, "download", lambda *_args, **_kwargs: pytest.fail("invalid service must not reach adapter"))
+
+    assert client.get("/api/lucida/status", params={"service": ""}).status_code == 400
+    assert client.get("/api/lucida/search", params={"q": "Kind of Blue", "service": "tidal"}).status_code == 400
+    assert client.post("/api/lucida/download", json={
+        "url": "https://www.qobuz.com/album", "kind": "album", "service": "",
+    }).status_code == 400
+
+
+def test_lucida_setup_acquires_clearance_in_background_job(client, monkeypatch):
+    import src.lucida.cf as cf
+
+    acquired = []
+    monkeypatch.setattr(cf, "acquire", lambda *, visible: acquired.append(visible) or ("token", "agent"))
+
+    response = client.post("/api/lucida/setup")
+
+    assert response.status_code == 200
+    status = wait_job(client, response.json()["job_id"])
+    assert acquired == [True]
+    assert status["status"] == "done"
+    assert status["result"] == {"access_ready": True}
+
+
+def test_lucida_setup_reports_missing_playwright_as_unavailable_without_opening_browser(client, monkeypatch):
+    """The real clearance flow must preserve its missing optional dependency."""
+    import src.lucida.cf as cf
+
+    imports = []
+
+    def missing_playwright(name):
+        imports.append(name)
+        raise ModuleNotFoundError("No module named 'playwright'")
+
+    monkeypatch.setattr(cf.importlib, "import_module", missing_playwright)
+
+    response = client.post("/api/lucida/setup")
+    status = wait_job(client, response.json()["job_id"])
+
+    assert response.status_code == 200
+    assert imports == ["playwright.sync_api"]
+    assert status["status"] == "error"
+    assert status["error"]["code"] == "api.errors.lucida_unavailable"
+
+
+def test_lucida_search_allowlists_public_fields(client, monkeypatch):
+    monkeypatch.setattr(routes.lucida, "search", lambda query, service="qobuz": {
+        "albums": [{
+            "url": "https://www.qobuz.com/album",
+            "title": query,
+            "artist": "Miles Davis",
+            "album": "Kind of Blue",
+            "cover_url": "https://images.example/cover.jpg",
+            "service": service,
+            "error": "upstream secret album error",
+            "token": "upstream secret album token",
+        }],
+        "tracks": [{
+            "url": "https://www.qobuz.com/track",
+            "title": "So What",
+            "artist": "Miles Davis",
+            "album": "Kind of Blue",
+            "cover_url": "javascript:alert(1)",
+            "message": "upstream secret track error",
+            "token": "upstream secret track token",
+        }],
+    })
+
+    response = client.get("/api/lucida/search", params={"q": "Kind of Blue", "service": "qobuz"})
+
+    assert response.status_code == 200
+    assert response.json() == {
+        "albums": [{
+            "url": "https://www.qobuz.com/album",
+            "title": "Kind of Blue",
+            "artist": "Miles Davis",
+            "album": "Kind of Blue",
+            "cover_url": "https://images.example/cover.jpg",
+        }],
+        "tracks": [{
+            "url": "https://www.qobuz.com/track",
+            "title": "So What",
+            "artist": "Miles Davis",
+            "album": "Kind of Blue",
+        }],
+    }
+    assert "upstream secret" not in response.text
+
+
+def test_lucida_release_preview_is_read_only_and_allowlists_metadata(client, monkeypatch):
+    calls = []
+    monkeypatch.setattr(routes.lucida, "release_preview", lambda url, service="qobuz", country=None: calls.append((url, service, country)) or {
+        "title": "Blue", "artist": "Miles", "cover_url": "https://images.example/cover.jpg",
+        "tracks": [{"number": 1, "title": "So What", "duration": 562, "url": "secret", "csrf": "secret"}],
+        "track_count": 1, "token": "secret", "expiry": 1,
+    })
+
+    response = client.get("/api/lucida/release", params={"url": "https://www.qobuz.com/album/x"})
+
+    assert response.status_code == 200
+    assert response.json() == {"title": "Blue", "artist": "Miles", "cover_url": "https://images.example/cover.jpg",
+                               "tracks": [{"number": 1, "title": "So What", "duration": 562}], "track_count": 1}
+    assert calls == [("https://www.qobuz.com/album/x", "qobuz", None)]
+    assert "secret" not in response.text
+
+
+def test_lucida_release_preview_replaces_token_number_with_track_ordinal(client, monkeypatch):
+    monkeypatch.setattr(routes.lucida, "release_preview", lambda *_args, **_kwargs: {
+        "tracks": [{"number": "csrf-token", "title": "Track"}],
+    })
+
+    response = client.get("/api/lucida/release", params={"url": "https://www.qobuz.com/album/x"})
+
+    assert response.status_code == 200
+    assert response.json()["tracks"] == [{"number": 1, "title": "Track"}]
+
+
+@pytest.mark.parametrize("duration", [math.nan, math.inf, -math.inf, -1, True])
+def test_lucida_release_preview_drops_invalid_duration_without_server_error(client, monkeypatch, duration):
+    monkeypatch.setattr(routes.lucida, "release_preview", lambda *_args, **_kwargs: {
+        "tracks": [{"number": 1, "title": "Track", "duration": duration}],
+    })
+
+    response = client.get("/api/lucida/release", params={"url": "https://www.qobuz.com/album/x"})
+
+    assert response.status_code == 200
+    assert response.json()["tracks"] == [{"number": 1, "title": "Track"}]
+
+
+@pytest.mark.parametrize("number", [True, -1, 1.5, 2**53, "9007199254740992", "csrf-token"])
+def test_lucida_release_preview_normalizes_unsafe_track_number_to_ordinal(client, monkeypatch, number):
+    monkeypatch.setattr(routes.lucida, "release_preview", lambda *_args, **_kwargs: {
+        "tracks": [{"number": number, "title": "Track"}],
+    })
+
+    response = client.get("/api/lucida/release", params={"url": "https://www.qobuz.com/album/x"})
+
+    assert response.status_code == 200
+    assert response.json()["tracks"] == [{"number": 1, "title": "Track"}]
+
+
+def test_lucida_progress_exposes_flat_counts(client):
+    class Job:
+        def __init__(self): self.events = []
+        def push(self, value, percent=None, **kwargs): self.events.append({"message": value, "percent": percent, **kwargs})
+    job = Job()
+
+    routes._lucida_progress(job, {"type": "item", "status": "skip", "done": 2, "total": 4, "percent": 50})
+
+    assert job.events[-1]["done"] == 2
+    assert job.events[-1]["total"] == 4
+    assert job.events[-1]["percent"] == 50
+
+
+def test_lucida_search_explicit_service_overrides_config_and_passes_country(client, monkeypatch):
+    import src.config as config
+
+    config.save_config({config.LUCIDA_SERVICE_KEY: "qobuz", config.LUCIDA_COUNTRY_KEY: "US"})
+    calls = []
+
+    def search(query, service="qobuz", country=None):
+        calls.append((query, service, country))
+        return {"albums": [], "tracks": []}
+
+    monkeypatch.setattr(routes.lucida, "search", search)
+    response = client.get("/api/lucida/search", params={"q": "Kind of Blue", "service": "amazon"})
+
+    assert response.status_code == 200
+    assert calls == [("Kind of Blue", "amazon", "US")]
+
+
+def test_lucida_search_omits_non_string_allowed_field_values(client, monkeypatch):
+    monkeypatch.setattr(routes.lucida, "search", lambda _query, service="qobuz": {
+        "albums": [{
+            "url": None,
+            "title": 7,
+            "artist": True,
+            "album": ["Kind of Blue"],
+        }],
+        "tracks": [{
+            "url": "https://www.qobuz.com/track",
+            "title": "So What",
+            "artist": {"name": "Miles Davis"},
+            "album": "Kind of Blue",
+        }],
+    })
+
+    response = client.get("/api/lucida/search", params={"q": "Kind of Blue"})
+
+    assert response.status_code == 200
+    assert response.json() == {
+        "albums": [{}],
+        "tracks": [{
+            "url": "https://www.qobuz.com/track",
+            "title": "So What",
+            "album": "Kind of Blue",
+        }],
+    }
+
+
+def test_lucida_search_returns_empty_collections_for_non_dict_adapter_result(client, monkeypatch):
+    monkeypatch.setattr(routes.lucida, "search", lambda _query, service="qobuz": ["not", "a", "result"])
+
+    response = client.get("/api/lucida/search", params={"q": "Kind of Blue"})
+
+    assert response.status_code == 200
+    assert response.json() == {"albums": [], "tracks": []}
+
+
+def test_lucida_search_maps_access_error_to_structured_response(client, monkeypatch):
+    def access_required(*_args, **_kwargs):
+        raise routes.ClearanceAccessError("clearance is missing")
+
+    monkeypatch.setattr(routes.lucida, "search", access_required)
+
+    response = client.get("/api/lucida/search", params={"q": "Kind of Blue"})
+
+    assert response.status_code == 403
+    assert response.json()["detail"] == {
+        "code": "api.errors.lucida_access_required",
+        "params": {},
+        "message": "Lucida access is required. Complete setup first.",
+    }
+
+
+@pytest.mark.parametrize(
+    ("failure", "status", "code", "fallback"),
+    [
+        (routes.ClearanceAccessError("clearance missing"), 403, "api.errors.lucida_access_required", "Lucida access is required. Complete setup first."),
+        (ModuleNotFoundError("playwright"), 503, "api.errors.lucida_unavailable", "Lucida is unavailable on this installation."),
+        (RuntimeError("provider diagnostic"), 502, "api.errors.lucida_failed", "Lucida search failed."),
+    ],
+)
+def test_lucida_search_maps_failures_to_public_structured_errors(client, monkeypatch, failure, status, code, fallback):
+    def search(*_args, **_kwargs):
+        raise failure
+
+    monkeypatch.setattr(routes.lucida, "search", search)
+
+    response = client.get("/api/lucida/search", params={"q": "Kind of Blue"})
+
+    assert response.status_code == status
+    assert response.json()["detail"] == {"code": code, "params": {}, "message": fallback}
+
+
+def test_lucida_download_streams_adapter_progress_through_job_manager(client, monkeypatch, caplog):
+    calls = []
+
+    def download(url, kind, service="qobuz", jobs=3, progress=None):
+        calls.append((url, kind, service, jobs))
+        progress({"type": "status", "url": url, "message": "upstream secret: Preparing"})
+        progress({"type": "bytes", "url": url, "bytes": 512})
+        progress({"type": "item", "url": url, "status": "fail"})
+        return {
+            "error": "upstream secret: top-level error",
+            "message": "upstream secret: top-level message",
+            "provider_token": "upstream secret: top-level arbitrary field",
+            "items": [{
+                "url": url,
+                "title": "Track",
+                "status": "upstream secret diagnostic status",
+                "error": "upstream secret: item error",
+                "message": "upstream secret: item message",
+                "csrf": "upstream secret: item arbitrary field",
+            }],
+        }
+
+    monkeypatch.setattr(routes.lucida, "download", download)
+
+    response = client.post("/api/lucida/download", json={
+        "url": "https://www.qobuz.com/album",
+        "kind": "album",
+        "service": "qobuz",
+    })
+
+    assert response.status_code == 200
+    job_id = response.json()["job_id"]
+    status = wait_job(client, job_id)
+    assert calls == [("https://www.qobuz.com/album", "album", "qobuz", 3)]
+    assert status["status"] == "done"
+    assert status["result"] == {
+        "items": [{
+            "url": "https://www.qobuz.com/album",
+            "title": "Track",
+            "status": "fail",
+            "error": {
+                "code": "api.errors.lucida_failed",
+                "params": {},
+                "message": "Lucida download failed.",
+            },
+        }],
+        "error": {
+            "code": "api.errors.lucida_failed",
+            "params": {},
+            "message": "Lucida download failed.",
+        },
+    }
+    assert "upstream secret" not in str(status)
+    assert "message" not in status["result"]
+    assert "provider_token" not in status["result"]
+    assert "message" not in status["result"]["items"][0]
+    assert "csrf" not in status["result"]["items"][0]
+    assert "upstream secret diagnostic status" not in str(status)
+    progress = [event for event in jobs.get(job_id).events if event["type"] == "progress"]
+    assert [event["message"]["code"] for event in progress] == [
+        "jobs.lucida.status_working", "jobs.lucida.bytes", "jobs.lucida.item_failed",
+    ]
+    assert progress[1]["message"]["params"] == {"bytes": 512}
+    assert "upstream secret" not in str(progress)
+    events = client.get(f"/api/jobs/{job_id}/events")
+    assert events.status_code == 200
+    assert "upstream secret" not in events.text
+    assert "upstream secret" not in caplog.text
+    assert [record.getMessage() for record in caplog.records] == [
+        "Lucida download result failed [lucida_result_failed]",
+        "Lucida download item failed [lucida_item_failed]",
+    ]
+
+
+@pytest.mark.parametrize("failure_field", ["error", "message"])
+def test_lucida_download_marks_item_failure_without_status_as_failed(client, monkeypatch, failure_field):
+    def download(url, kind, service="qobuz", jobs=3, progress=None):
+        return {
+            "items": [{
+                "url": url,
+                "title": "Track",
+                failure_field: "provider-detail",
+            }],
+        }
+
+    monkeypatch.setattr(routes.lucida, "download", download)
+
+    response = client.post("/api/lucida/download", json={
+        "url": "https://www.qobuz.com/track",
+        "kind": "track",
+        "service": "qobuz",
+    })
+
+    assert response.status_code == 200
+    status = wait_job(client, response.json()["job_id"])
+    assert status["status"] == "done"
+    assert status["result"] == {
+        "items": [{
+            "url": "https://www.qobuz.com/track",
+            "title": "Track",
+            "status": "fail",
+            "error": {
+                "code": "api.errors.lucida_failed",
+                "params": {},
+                "message": "Lucida download failed.",
+            },
+        }],
+    }
+    assert "provider-detail" not in str(status)
+
+
+def test_lucida_download_uses_configured_defaults_when_payload_omits_them(client, monkeypatch):
+    import src.config as config
+
+    config.save_config({
+        config.LUCIDA_SERVICE_KEY: "amazon",
+        config.LUCIDA_JOBS_KEY: 5,
+    })
+    calls = []
+
+    def download(url, kind, service="qobuz", jobs=3, progress=None):
+        calls.append((url, kind, service, jobs))
+        return {"items": []}
+
+    monkeypatch.setattr(routes.lucida, "download", download)
+
+    response = client.post("/api/lucida/download", json={
+            "url": "https://www.qobuz.com/album", "kind": "album",
+    })
+
+    assert response.status_code == 200
+    status = wait_job(client, response.json()["job_id"])
+    assert status["status"] == "done"
+    assert calls == [("https://www.qobuz.com/album", "album", "amazon", 5)]
+
+
+def test_lucida_download_explicit_service_overrides_config_and_passes_country(client, monkeypatch):
+    import src.config as config
+
+    config.save_config({config.LUCIDA_SERVICE_KEY: "qobuz", config.LUCIDA_COUNTRY_KEY: "US"})
+    calls = []
+
+    def download(url, kind, service="qobuz", jobs=3, progress=None, country=None):
+        calls.append((url, kind, service, jobs, country))
+        return {"items": []}
+
+    monkeypatch.setattr(routes.lucida, "download", download)
+    response = client.post("/api/lucida/download", json={
+            "url": "https://www.qobuz.com/album", "kind": "album", "service": "amazon",
+    })
+
+    assert response.status_code == 200
+    assert wait_job(client, response.json()["job_id"])["status"] == "done"
+    assert calls == [("https://www.qobuz.com/album", "album", "amazon", 3, "US")]
+
+
+@pytest.mark.parametrize("field,value", [("url", 7), ("url", {"url": "x"}), ("kind", 7), ("kind", ["album"])])
+def test_lucida_download_rejects_non_string_url_and_kind(client, monkeypatch, field, value):
+    monkeypatch.setattr(routes.lucida, "download", lambda *_args, **_kwargs: pytest.fail("invalid payload must not reach adapter"))
+    payload = {"url": "https://www.qobuz.com/album", "kind": "album"}
+    payload[field] = value
+
+    assert client.post("/api/lucida/download", json=payload).status_code == 400
+
+
+@pytest.mark.parametrize(
+    "url",
+    ["   ", "/album", "file:///tmp/album", "https:///album", "https://[", "https://@/album"],
+)
+def test_lucida_download_rejects_non_absolute_http_url_before_creating_job(client, monkeypatch, url):
+    monkeypatch.setattr(routes.lucida, "download", lambda *_args, **_kwargs: pytest.fail("invalid URL must not reach adapter"))
+    monkeypatch.setattr(routes.jobs, "submit", lambda *_args, **_kwargs: pytest.fail("invalid URL must not create a job"))
+
+    response = client.post("/api/lucida/download", json={"url": url, "kind": "album"})
+
+    assert response.status_code == 400
+
+
+def test_lucida_download_strips_and_passes_normalized_absolute_http_url(client, monkeypatch):
+    calls = []
+
+    def download(url, kind, service="qobuz", jobs=3, progress=None, country=None):
+        calls.append(url)
+        return {"items": []}
+
+    monkeypatch.setattr(routes.lucida, "download", download)
+
+    response = client.post("/api/lucida/download", json={
+        "url": "  https://www.qobuz.com/album  ", "kind": "album",
+    })
+
+    assert response.status_code == 200
+    assert wait_job(client, response.json()["job_id"])["status"] == "done"
+    assert calls == ["https://www.qobuz.com/album"]
+
+
+@pytest.mark.parametrize("jobs", [0, 9, 3.0, True, "many"])
+def test_lucida_download_rejects_invalid_explicit_jobs(client, monkeypatch, jobs):
+    monkeypatch.setattr(routes.lucida, "download", lambda *_args, **_kwargs: pytest.fail("invalid jobs must not reach adapter"))
+
+    response = client.post("/api/lucida/download", json={
+        "url": "https://www.qobuz.com/album", "kind": "album", "jobs": jobs,
+    })
+
+    assert response.status_code == 400
+
+
+def test_lucida_download_accepts_bounded_integer_string_jobs(client, monkeypatch):
+    calls = []
+
+    def download(url, kind, service="qobuz", jobs=3, progress=None, country=None):
+        calls.append((url, kind, service, jobs, country))
+        return {"items": []}
+
+    monkeypatch.setattr(routes.lucida, "download", download)
+    response = client.post("/api/lucida/download", json={
+        "url": "https://www.qobuz.com/album", "kind": "album", "jobs": "6",
+    })
+
+    assert response.status_code == 200
+    assert wait_job(client, response.json()["job_id"])["status"] == "done"
+    assert calls == [("https://www.qobuz.com/album", "album", "qobuz", 6, None)]
+
+
+def test_lucida_settings_round_trip_and_clear_country(client):
+    defaults = client.get("/api/settings")
+    assert defaults.status_code == 200
+    assert {key: defaults.json()[key] for key in ("lucida_service", "lucida_country", "lucida_jobs")} == {
+        "lucida_service": "qobuz", "lucida_country": "", "lucida_jobs": 3,
+    }
+
+    saved = client.put("/api/settings", json={
+        "lucida_service": "amazon", "lucida_country": "us", "lucida_jobs": "5",
+    })
+    assert saved.status_code == 200
+    assert set(saved.json()["updated"]) == {"lucida_service", "lucida_country", "lucida_jobs"}
+    assert {key: client.get("/api/settings").json()[key] for key in ("lucida_service", "lucida_country", "lucida_jobs")} == {
+        "lucida_service": "amazon", "lucida_country": "US", "lucida_jobs": 5,
+    }
+
+    cleared = client.put("/api/settings", json={"lucida_country": ""})
+    assert cleared.status_code == 200
+    assert client.get("/api/settings").json()["lucida_country"] == ""
+
+
+@pytest.mark.parametrize("payload", [
+    {"lucida_service": "tidal"},
+    {"lucida_service": ""},
+    {"lucida_jobs": 0},
+    {"lucida_jobs": 9},
+    {"lucida_jobs": 3.0},
+])
+def test_lucida_settings_reject_invalid_service_and_jobs(client, payload):
+    assert client.put("/api/settings", json=payload).status_code == 400
+
+
+@pytest.mark.parametrize("country", ["USA", "u1", "éé", "ſs", 1])
+def test_lucida_country_settings_reject_invalid_country(client, country):
+    assert client.put("/api/settings", json={"lucida_country": country}).status_code == 400
+
+
+def test_settings_api_hides_invalid_persisted_lucida_country(client):
+    import src.config as config
+
+    config.save_config({config.LUCIDA_COUNTRY_KEY: "USA"})
+
+    response = client.get("/api/settings")
+
+    assert response.status_code == 200
+    assert response.json()[config.LUCIDA_COUNTRY_KEY] == ""
+
+
+@pytest.mark.parametrize(
+    ("failure", "code"),
+    [
+        (routes.ClearanceAccessError("upstream secret access"), "api.errors.lucida_access_required"),
+        (ModuleNotFoundError("upstream secret unavailable"), "api.errors.lucida_unavailable"),
+        (RuntimeError("upstream secret generic"), "api.errors.lucida_failed"),
+    ],
+)
+def test_lucida_setup_job_uses_safe_error_descriptor(client, monkeypatch, failure, code):
+    import src.lucida.cf as cf
+
+    def acquire(**_kwargs):
+        raise failure
+
+    monkeypatch.setattr(cf, "acquire", acquire)
+
+    response = client.post("/api/lucida/setup")
+    status = wait_job(client, response.json()["job_id"])
+
+    assert status["status"] == "error"
+    assert status["error"]["code"] == code
+    assert "upstream secret" not in str(status)
+
+
+@pytest.mark.parametrize(
+    ("failure", "code"),
+    [
+        (routes.ClearanceAccessError("upstream secret access"), "api.errors.lucida_access_required"),
+        (ModuleNotFoundError("upstream secret unavailable"), "api.errors.lucida_unavailable"),
+        (RuntimeError("upstream secret generic"), "api.errors.lucida_failed"),
+    ],
+)
+def test_lucida_download_job_uses_safe_error_descriptor(client, monkeypatch, failure, code):
+    def download(*_args, **_kwargs):
+        raise failure
+
+    monkeypatch.setattr(routes.lucida, "download", download)
+
+    response = client.post("/api/lucida/download", json={
+        "url": "https://www.qobuz.com/album", "kind": "album", "service": "qobuz",
+    })
+    status = wait_job(client, response.json()["job_id"])
+
+    assert status["status"] == "error"
+    assert status["error"]["code"] == code
+    assert "upstream secret" not in str(status)
+
+
+def test_lucida_download_http_403_is_access_required_job_error(client, monkeypatch):
+    from src.lucida.http import LucidaAccessRequired
+
+    def download(*_args, **_kwargs):
+        raise LucidaAccessRequired("provider detail")
+
+    monkeypatch.setattr(routes.lucida, "download", download)
+    response = client.post("/api/lucida/download", json={
+        "url": "https://www.qobuz.com/album", "kind": "album",
+    })
+
+    status = wait_job(client, response.json()["job_id"])
+    assert status["status"] == "error"
+    assert status["error"]["code"] == "api.errors.lucida_access_required"
+    assert status.get("result") is None
 
 
 # --- Состояние / настройки ------------------------------------------------
