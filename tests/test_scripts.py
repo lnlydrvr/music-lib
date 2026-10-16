@@ -140,38 +140,76 @@ class TestRunMain:
         monkeypatch.setattr(run_mod.subprocess, "call", fake_call)
         return cmds, launched
 
+    def test_installs_playwright_chromium_when_missing(self, monkeypatch):
+        cmds, launched = self._patch(monkeypatch)
+        monkeypatch.setattr(run_mod, "chromium_installed", lambda: False)
+        monkeypatch.setattr(run_mod, "playwright_installed", lambda: True)
+        assert run_mod.main([]) == 7
+        assert cmds == [[sys.executable, "-m", "playwright", "install", "chromium"]]
+        assert launched
+
+    def test_skips_playwright_install_when_chromium_exists(self, monkeypatch):
+        cmds, _launched = self._patch(monkeypatch)
+        monkeypatch.setattr(run_mod, "chromium_installed", lambda: True)
+        monkeypatch.setattr(run_mod, "playwright_installed", lambda: True)
+        run_mod.main([])
+        assert cmds == []
+
+    def test_continues_startup_when_playwright_install_fails(self, monkeypatch, capsys):
+        cmds, launched = self._patch(monkeypatch, cmd_code=1)
+        monkeypatch.setattr(run_mod, "chromium_installed", lambda: False)
+        monkeypatch.setattr(run_mod, "playwright_installed", lambda: True)
+        assert run_mod.main([]) == 7
+        assert cmds == [[sys.executable, "-m", "playwright", "install", "chromium"]]
+        assert launched
+        assert "Не удалось установить Chromium; продолжаю запуск приложения." in capsys.readouterr().out
+
+    def test_skips_chromium_install_when_playwright_missing(self, monkeypatch):
+        cmds, launched = self._patch(monkeypatch)
+        monkeypatch.setattr(run_mod, "chromium_installed", lambda: False)
+        monkeypatch.setattr(run_mod, "playwright_installed", lambda: False)
+        assert run_mod.main([]) == 7
+        assert cmds == []
+        assert launched
+
     def test_no_npm_returns_1(self, monkeypatch):
         cmds, launched = self._patch(monkeypatch, npm=None)
+        monkeypatch.setattr(run_mod, "chromium_installed", lambda: True)
         assert run_mod.main(["--port", "9000"]) == 1
         assert cmds == []
         assert launched == {}
 
     def test_fresh_dist_skips_install_and_build(self, monkeypatch):
         cmds, launched = self._patch(monkeypatch)
+        monkeypatch.setattr(run_mod, "chromium_installed", lambda: True)
         assert run_mod.main(["--port", "9000"]) == 7
         assert cmds == []
         assert launched["cmd"][2:] == ["--port", "9000"]
 
     def test_launches_app_with_sys_python(self, monkeypatch):
         _cmds, launched = self._patch(monkeypatch)
+        monkeypatch.setattr(run_mod, "chromium_installed", lambda: True)
         run_mod.main([])
         assert launched["cmd"][0] == sys.executable
         assert launched["cmd"][1].endswith("app.py")
 
     def test_stale_runs_ci_build_then_app(self, monkeypatch):
         cmds, launched = self._patch(monkeypatch, install=True, build=True)
+        monkeypatch.setattr(run_mod, "chromium_installed", lambda: True)
         assert run_mod.main([]) == 7
         assert cmds == [["/usr/bin/npm", "ci"], ["/usr/bin/npm", "run", "build"]]
         assert launched["cmd"][2:] == []
 
     def test_ci_failure_stops(self, monkeypatch):
         cmds, launched = self._patch(monkeypatch, install=True, cmd_code=3)
+        monkeypatch.setattr(run_mod, "chromium_installed", lambda: True)
         assert run_mod.main([]) == 3
         assert cmds == [["/usr/bin/npm", "ci"]]
         assert launched == {}
 
     def test_build_failure_stops(self, monkeypatch):
         cmds, launched = self._patch(monkeypatch, build=True, cmd_code=4)
+        monkeypatch.setattr(run_mod, "chromium_installed", lambda: True)
         assert run_mod.main([]) == 4
         assert launched == {}
 

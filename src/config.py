@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import shutil
 import sys
 import tempfile
@@ -120,6 +121,20 @@ DEFAULT_FEEDBACK_ACTION = "like"
 SEARCH_SOURCE_KEY = "search_source"
 SEARCH_SOURCES = ("youtube_music", "youtube")
 DEFAULT_SEARCH_SOURCE = "youtube_music"
+
+#: Lucida download source and optional storefront country. Country is unset by
+#: default so the adapter retains the service-specific default.
+LUCIDA_SERVICE_KEY = "lucida_service"
+LUCIDA_SERVICES = ("qobuz", "amazon")
+DEFAULT_LUCIDA_SERVICE = "qobuz"
+LUCIDA_COUNTRY_KEY = "lucida_country"
+
+#: Number of concurrent Lucida download jobs. Keep this deliberately bounded:
+#: each worker streams media and an excessive value degrades local networking.
+LUCIDA_JOBS_KEY = "lucida_jobs"
+DEFAULT_LUCIDA_JOBS = 3
+MIN_LUCIDA_JOBS = 1
+MAX_LUCIDA_JOBS = 8
 
 #: Скрытая системная папка внутри библиотеки (дефолтный шазам-файл и
 #: прочее служебное состояние). Переживает чистку контента библиотеки.
@@ -491,3 +506,43 @@ def get_search_source() -> str:
     raw = load_config().get(SEARCH_SOURCE_KEY, DEFAULT_SEARCH_SOURCE)
     value = str(raw).strip().lower() if raw else DEFAULT_SEARCH_SOURCE
     return value if value in SEARCH_SOURCES else DEFAULT_SEARCH_SOURCE
+
+
+def get_lucida_service() -> str:
+    """Lucida service (``qobuz`` or ``amazon``), with a safe default."""
+    raw = load_config().get(LUCIDA_SERVICE_KEY, DEFAULT_LUCIDA_SERVICE)
+    value = str(raw).strip().lower() if isinstance(raw, str) else DEFAULT_LUCIDA_SERVICE
+    return value if value in LUCIDA_SERVICES else DEFAULT_LUCIDA_SERVICE
+
+
+def get_lucida_country() -> str | None:
+    """Optional normalized Lucida storefront country, or ``None`` when unset."""
+    raw = load_config().get(LUCIDA_COUNTRY_KEY)
+    if not isinstance(raw, str):
+        return None
+    if not raw.isascii():
+        return None
+    value = raw.strip().upper()
+    return value if re.fullmatch(r"[A-Z]{2}", value, flags=re.ASCII) else None
+
+
+def get_lucida_jobs() -> int:
+    """Bounded concurrent Lucida download jobs, defaulting to three."""
+    value = parse_lucida_jobs(load_config().get(LUCIDA_JOBS_KEY, DEFAULT_LUCIDA_JOBS))
+    return value if value is not None else DEFAULT_LUCIDA_JOBS
+
+
+def parse_lucida_jobs(raw: Any) -> int | None:
+    """Return a bounded Lucida worker count, or ``None`` for invalid input."""
+    if isinstance(raw, bool):
+        return None
+    if isinstance(raw, int):
+        value = raw
+    elif isinstance(raw, str):
+        try:
+            value = int(raw)
+        except ValueError:
+            return None
+    else:
+        return None
+    return value if MIN_LUCIDA_JOBS <= value <= MAX_LUCIDA_JOBS else None

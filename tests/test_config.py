@@ -270,6 +270,55 @@ class TestSearchSource:
         assert config.get_search_source() == config.DEFAULT_SEARCH_SOURCE
 
 
+class TestLucidaSettings:
+    def test_defaults_are_safe_for_lucida_downloads(self, isolated_home):
+        assert config.get_lucida_service() == "qobuz"
+        assert config.get_lucida_country() is None
+        assert config.get_lucida_jobs() == 3
+
+    def test_normalizes_valid_service_and_country(self, isolated_home):
+        config.save_config({
+            config.LUCIDA_SERVICE_KEY: "  AMAZON ",
+            config.LUCIDA_COUNTRY_KEY: " us ",
+            config.LUCIDA_JOBS_KEY: "4",
+        })
+
+        assert config.get_lucida_service() == "amazon"
+        assert config.get_lucida_country() == "US"
+        assert config.get_lucida_jobs() == 4
+
+    @pytest.mark.parametrize("value", ["tidal", "", None, 7])
+    def test_invalid_service_falls_back_to_qobuz(self, isolated_home, value):
+        config.save_config({config.LUCIDA_SERVICE_KEY: value})
+
+        assert config.get_lucida_service() == "qobuz"
+
+    @pytest.mark.parametrize("value", ["", "   ", None, 4, []])
+    def test_empty_or_non_string_country_is_unset(self, isolated_home, value):
+        config.save_config({config.LUCIDA_COUNTRY_KEY: value})
+
+        assert config.get_lucida_country() is None
+
+    @pytest.mark.parametrize(("value", "expected"), [
+        ("USA", None),
+        ("1!", None),
+        ("ЖП", None),
+        ("ſs", None),
+        (" us ", "US"),
+        ("GB", "GB"),
+    ])
+    def test_lucida_country_accepts_only_normalized_ascii_iso_codes(self, isolated_home, value, expected):
+        config.save_config({config.LUCIDA_COUNTRY_KEY: value})
+
+        assert config.get_lucida_country() == expected
+
+    @pytest.mark.parametrize("value", [0, -1, 9, 3.0, "many", True])
+    def test_invalid_jobs_fall_back_to_default(self, isolated_home, value):
+        config.save_config({config.LUCIDA_JOBS_KEY: value})
+
+        assert config.get_lucida_jobs() == 3
+
+
 class TestYoutubeCookies:
     def test_browser_default_safari(self, isolated_home, monkeypatch):
         monkeypatch.delenv("MUSIC_LIB_BROWSER", raising=False)
